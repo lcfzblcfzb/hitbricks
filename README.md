@@ -1,2 +1,2 @@
 "# hitbricks" 
-lcf.test ssh233
+lcf.test ssh233lcf

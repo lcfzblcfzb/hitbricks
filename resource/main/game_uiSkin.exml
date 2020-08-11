@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<e:Skin class="game_bat"
+	 width="768"
+	height="1366" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
+	<e:Label text="Bat" x="302" y="1000" anchorOffsetX="0" width="100" anchorOffsetY="0" height="20" textColor="0x000000" backgroundColor="0x000000" background="true"/>
+	<e:Label id="Brick" text=" " x="316" y="87" anchorOffsetX="0" width="36" anchorOffsetY="0" height="28" background="true" backgroundColor="0xffffff"/>
+</e:Skin>
