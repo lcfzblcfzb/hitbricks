@@ -6,7 +6,7 @@ class GameManager {
 
 	bat: Bat;
 	balls: Ball[] = [];
-	bricks: Brick[] = [];
+	bricks: Array<Brick> = new Array();
 	stage: egret.DisplayObjectContainer;
 	trigger: egret.Shape;
 
@@ -25,10 +25,13 @@ class GameManager {
 		this.balls.push(ball);
 		this.stage.addChild(ball);
 
-		let brick: Brick = new Brick(stage);
-		this.stage.addChild(brick);
-		this.bricks.push(brick);
+		let demo =RES.getRes("demo_json");
 
+		for(let config of demo.bricks){
+			let brick: Brick = Brick.createByConfig(config);
+			this.stage.addChild(brick);
+		
+		}
 		this.trigger = new egret.Shape();
 		this.trigger.name = "startTrigger";
 		this.trigger.graphics.beginFill(0x00ff00, 0.2);

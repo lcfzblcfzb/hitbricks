@@ -1,15 +1,18 @@
 class Brick extends RebounceObj{
 	
-	public constructor(stage: egret.DisplayObjectContainer) {
+	public constructor() {
 		super();
-		this.name = "brick";
-        this.graphics.beginFill(0x00ff00, 1);
-        this.graphics.drawRect(0, 0, 10, 10);
-        this.graphics.endFill();
-        this.x = stage.stage.stageWidth / 2;
-        this.y = stage.stage.stageHeight * 0.1;
 	}
 
-
+    static createByConfig(config:{color,x,y,width,height}):Brick{
+        let brick = new Brick();
+        brick.x =config.x;
+        brick.y = config.y;
+        brick.name = "brick";
+        brick.graphics.beginFill(config.color, 1);
+        brick.graphics.drawRect(0, 0, config.width, config.height);
+        brick.graphics.endFill();
+        return brick;
+    }
 
 }

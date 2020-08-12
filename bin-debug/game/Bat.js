@@ -15,7 +15,7 @@ var Bat = (function (_super) {
         var stageW = stage.stage.stageWidth;
         var stageH = stage.stage.stageHeight;
         _this.name = "bat";
-        _this.graphics.beginFill(0x000000, 1);
+        _this.graphics.beginFill(0x000079, 1);
         _this.graphics.drawRect(0, 0, 100, 10);
         _this.width = 100;
         _this.height = 10;

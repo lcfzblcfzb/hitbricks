@@ -10,16 +10,19 @@ r.prototype = e.prototype, t.prototype = new r();
 };
 var Brick = (function (_super) {
     __extends(Brick, _super);
-    function Brick(stage) {
-        var _this = _super.call(this) || this;
-        _this.name = "brick";
-        _this.graphics.beginFill(0x00ff00, 1);
-        _this.graphics.drawRect(0, 0, 10, 10);
-        _this.graphics.endFill();
-        _this.x = stage.stage.stageWidth / 2;
-        _this.y = stage.stage.stageHeight * 0.1;
-        return _this;
+    function Brick() {
+        return _super.call(this) || this;
     }
+    Brick.createByConfig = function (config) {
+        var brick = new Brick();
+        brick.x = config.x;
+        brick.y = config.y;
+        brick.name = "brick";
+        brick.graphics.beginFill(0x00ff00, 1);
+        brick.graphics.drawRect(0, 0, config.width, config.height);
+        brick.graphics.endFill();
+        return brick;
+    };
     return Brick;
 }(RebounceObj));
 __reflect(Brick.prototype, "Brick");

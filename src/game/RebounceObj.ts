@@ -16,6 +16,9 @@ class RebounceObj extends egret.Sprite implements IFlexible {
 					target.revertYSpeed();
 				}
 
+				// let idx =GameManager.getInstance().bricks.indexOf(this);
+				// GameManager.getInstance().bricks[idx]=null;
+				GameManager.getInstance().bricks=GameManager.getInstance().bricks.filter(a=>a==this);
 				GameManager.getInstance().stage.removeChild(this);
 			}
 		}

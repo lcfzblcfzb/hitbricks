@@ -5,7 +5,7 @@ class Bat extends egret.Sprite {
 		let stageW = stage.stage.stageWidth;
 		let stageH = stage.stage.stageHeight;
 		this.name = "bat";
-		this.graphics.beginFill(0x000000, 1);
+		this.graphics.beginFill(0x000079, 1);
 		this.graphics.drawRect(0, 0, 100, 10);
 		this.width = 100;
 		this.height = 10;
