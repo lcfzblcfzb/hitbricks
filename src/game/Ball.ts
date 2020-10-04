@@ -1,4 +1,4 @@
-class Ball extends egret.Sprite implements IMovable {
+class Ball extends egret.Sprite implements IMovable,IConfigurable {
 
 	speedX: number = 0;
 	speedY: number = 0;
@@ -38,5 +38,8 @@ class Ball extends egret.Sprite implements IMovable {
 	revertYSpeed(): void {
 		this.speedY = -this.speedY;
 	}
-
+	//override
+	getName():string{
+		return BALL;
+	}
 }

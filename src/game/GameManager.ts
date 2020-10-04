@@ -9,9 +9,23 @@ class GameManager {
 	bricks: Array<Brick> = new Array();
 	stage: egret.DisplayObjectContainer;
 	trigger: egret.Shape;
+	entityMap: { [key: number]: Array<IConfigurable> } = {};
 
 	static getInstance(): GameManager {
 		return GameManager.gm;
+	}
+
+	private addToEntityMap(e: IConfigurable) {
+
+		//枚举恶心心
+		if (this.entityMap[e.getName()] != null) {
+			this.entityMap[e.getName()].push(e);
+		} else {
+			let arry = new Array();
+			arry.push(e);
+			this.entityMap[e.getName()] = arry;
+		}
+
 	}
 
 	init(stage: egret.DisplayObjectContainer): void {
@@ -25,12 +39,14 @@ class GameManager {
 		this.balls.push(ball);
 		this.stage.addChild(ball);
 
-		let demo =RES.getRes("demo_json");
+		let demo = RES.getRes("demo_json");
 
-		for(let config of demo.bricks){
-			let brick: Brick = Brick.createByConfig(config);
-			this.stage.addChild(brick);
-		
+		for (let config of demo.configurables) {
+			if (getConfigurableByType(config.type) != null) {
+				let configable: IConfigurable = newInstance(getConfigurableByType(config.type), config);
+				this.stage.addChild(configable);
+				this.addToEntityMap(configable);
+			}
 		}
 		this.trigger = new egret.Shape();
 		this.trigger.name = "startTrigger";
@@ -51,7 +67,7 @@ class GameManager {
 
 		for (let ball of this.balls) {
 			ball.speedY = -3;
-			ball.speedX = 5;
+			ball.speedX = 0;
 		}
 
 		this.stage.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapInitBegin, this);
@@ -71,12 +87,14 @@ class GameManager {
 				ball.revertYSpeed();
 			}
 
-			for (let brick of this.bricks) {
+			if (this.entityMap[BRICK] != null) {
+				for (let brick of this.entityMap[BRICK]) {
 
-				let brickRec = brick.getTransformedBounds(this.stage);
+					let brickRec = brick.getTransformedBounds(this.stage);
 
-				if (brickRec.intersects(ballRec)) {
-					brick.onHit(ball);
+					if (brickRec.intersects(ballRec)) {
+						(<Brick>brick).onHit(ball);
+					}
 				}
 			}
 		}

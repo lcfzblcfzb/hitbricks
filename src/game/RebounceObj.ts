@@ -1,4 +1,6 @@
-class RebounceObj extends egret.Sprite implements IFlexible {
+abstract class RebounceObj extends egret.Sprite implements IFlexible, IConfigurable {
+
+	deleteOnHit: boolean = false;
 
 	onHit(target: IMovable) {
 		//需要传入全局对象得到相对全局坐标的矩形；
@@ -8,7 +10,7 @@ class RebounceObj extends egret.Sprite implements IFlexible {
 		//计算反弹
 		let intersectPoints = this.calcPoints(inflateRec, target.speedY / target.speedX, target.y - target.x * target.speedY / target.speedX);
 		if (intersectPoints.length > 0) {
-			let firstP = this.calcFirstIntersecPoint(intersectPoints,target);
+			let firstP = this.calcFirstIntersecPoint(intersectPoints, target);
 			if (firstP != null) {
 				if (firstP.x == inflateRec.left || firstP.x == inflateRec.right) {
 					target.revertXSpeed();
@@ -16,13 +18,19 @@ class RebounceObj extends egret.Sprite implements IFlexible {
 					target.revertYSpeed();
 				}
 
-				// let idx =GameManager.getInstance().bricks.indexOf(this);
-				// GameManager.getInstance().bricks[idx]=null;
-				GameManager.getInstance().bricks=GameManager.getInstance().bricks.filter(a=>a==this);
-				GameManager.getInstance().stage.removeChild(this);
+				if (this.deleteOnHit) {
+					let thisIndex = GameManager.getInstance().entityMap[this.getName()].indexOf(this);
+					if (thisIndex >= 0) {
+						GameManager.getInstance().entityMap[this.getName()].splice(thisIndex, 1);
+					}
+					// GameManager.getInstance().bricks = GameManager.getInstance().bricks.filter(a => a == this);
+					GameManager.getInstance().stage.removeChild(this);
+				}
 			}
 		}
 	}
+
+	abstract getName(): string;
 
 	public constructor() {
 		super();

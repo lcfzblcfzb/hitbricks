@@ -1,18 +1,19 @@
-class Brick extends RebounceObj{
-	
-	public constructor() {
-		super();
-	}
+class Brick extends RebounceObj {
 
-    static createByConfig(config:{color,x,y,width,height}):Brick{
-        let brick = new Brick();
-        brick.x =config.x;
-        brick.y = config.y;
-        brick.name = "brick";
-        brick.graphics.beginFill(config.color, 1);
-        brick.graphics.drawRect(0, 0, config.width, config.height);
-        brick.graphics.endFill();
-        return brick;
+    public constructor(config: any) {
+        super();
+        this.x = config.x;
+        this.y = config.y;
+        this.name = "brick";
+        this.graphics.beginFill(config.color, 1);
+        this.graphics.drawRect(0, 0, config.width, config.height);
+        this.graphics.endFill();
+        this.deleteOnHit == true;
+    }
+
+    getName(): string {
+        return BRICK;
     }
 
 }
+

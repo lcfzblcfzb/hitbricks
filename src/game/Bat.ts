@@ -1,4 +1,4 @@
-class Bat extends egret.Sprite {
+class Bat extends egret.Sprite implements IConfigurable {
 	
 	public constructor(stage: egret.DisplayObjectContainer) {
 		super();
@@ -13,7 +13,9 @@ class Bat extends egret.Sprite {
 		this.y = stageH * 0.8;
 		this.graphics.endFill();
 	}
-
-
+	//overide
+	getName():string{
+		return BAT;
+	}
 	
 }

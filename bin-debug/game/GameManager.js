@@ -5,9 +5,21 @@ var GameManager = (function () {
     function GameManager() {
         this.balls = [];
         this.bricks = new Array();
+        this.entityMap = {};
     }
     GameManager.getInstance = function () {
         return GameManager.gm;
+    };
+    GameManager.prototype.addToEntityMap = function (e) {
+        //枚举恶心心
+        if (this.entityMap[e.getName()] != null) {
+            this.entityMap[e.getName()].push(e);
+        }
+        else {
+            var arry = new Array();
+            arry.push(e);
+            this.entityMap[e.getName()] = arry;
+        }
     };
     GameManager.prototype.init = function (stage) {
         //TODO 初始化
@@ -18,10 +30,13 @@ var GameManager = (function () {
         this.balls.push(ball);
         this.stage.addChild(ball);
         var demo = RES.getRes("demo_json");
-        for (var _i = 0, _a = demo.bricks; _i < _a.length; _i++) {
+        for (var _i = 0, _a = demo.configurables; _i < _a.length; _i++) {
             var config = _a[_i];
-            var brick = Brick.createByConfig(config);
-            this.stage.addChild(brick);
+            if (getConfigurableByType(config.type) != null) {
+                var configable = newInstance(getConfigurableByType(config.type), config);
+                this.stage.addChild(configable);
+                this.addToEntityMap(configable);
+            }
         }
         this.trigger = new egret.Shape();
         this.trigger.name = "startTrigger";
@@ -40,7 +55,7 @@ var GameManager = (function () {
         for (var _i = 0, _a = this.balls; _i < _a.length; _i++) {
             var ball = _a[_i];
             ball.speedY = -3;
-            ball.speedX = 5;
+            ball.speedX = 0;
         }
         this.stage.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapInitBegin, this);
         this.trigger.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchTapPlaying, this);
@@ -56,11 +71,13 @@ var GameManager = (function () {
             if (batRec.intersects(ballRec)) {
                 ball.revertYSpeed();
             }
-            for (var _b = 0, _c = this.bricks; _b < _c.length; _b++) {
-                var brick = _c[_b];
-                var brickRec = brick.getTransformedBounds(this.stage);
-                if (brickRec.intersects(ballRec)) {
-                    brick.onHit(ball);
+            if (this.entityMap[BRICK] != null) {
+                for (var _b = 0, _c = this.entityMap[BRICK]; _b < _c.length; _b++) {
+                    var brick = _c[_b];
+                    var brickRec = brick.getTransformedBounds(this.stage);
+                    if (brickRec.intersects(ballRec)) {
+                        brick.onHit(ball);
+                    }
                 }
             }
         }

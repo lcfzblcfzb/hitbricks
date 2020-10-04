@@ -10,18 +10,18 @@ r.prototype = e.prototype, t.prototype = new r();
 };
 var Brick = (function (_super) {
     __extends(Brick, _super);
-    function Brick() {
-        return _super.call(this) || this;
+    function Brick(config) {
+        var _this = _super.call(this) || this;
+        _this.x = config.x;
+        _this.y = config.y;
+        _this.name = "brick";
+        _this.graphics.beginFill(config.color, 1);
+        _this.graphics.drawRect(0, 0, config.width, config.height);
+        _this.graphics.endFill();
+        return _this;
     }
-    Brick.createByConfig = function (config) {
-        var brick = new Brick();
-        brick.x = config.x;
-        brick.y = config.y;
-        brick.name = "brick";
-        brick.graphics.beginFill(0x00ff00, 1);
-        brick.graphics.drawRect(0, 0, config.width, config.height);
-        brick.graphics.endFill();
-        return brick;
+    Brick.prototype.getName = function () {
+        return BRICK;
     };
     return Brick;
 }(RebounceObj));

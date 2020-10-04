@@ -14,7 +14,6 @@ var RebounceObj = (function (_super) {
         return _super.call(this) || this;
     }
     RebounceObj.prototype.onHit = function (target) {
-        var _this = this;
         //需要传入全局对象得到相对全局坐标的矩形；
         var inflateRec = this.getTransformedBounds(GameManager.getInstance().stage).clone();
         inflateRec.inflate(target.width / 2, target.height / 2); //计算出碰撞外壳矩形;
@@ -31,7 +30,11 @@ var RebounceObj = (function (_super) {
                 }
                 // let idx =GameManager.getInstance().bricks.indexOf(this);
                 // GameManager.getInstance().bricks[idx]=null;
-                GameManager.getInstance().bricks = GameManager.getInstance().bricks.filter(function (a) { return a == _this; });
+                var thisIndex = GameManager.getInstance().entityMap[this.getName()].indexOf(this);
+                if (thisIndex >= 0) {
+                    GameManager.getInstance().entityMap[this.getName()].splice(thisIndex, 1);
+                }
+                // GameManager.getInstance().bricks = GameManager.getInstance().bricks.filter(a => a == this);
                 GameManager.getInstance().stage.removeChild(this);
             }
         }
@@ -100,5 +103,5 @@ var RebounceObj = (function (_super) {
     };
     return RebounceObj;
 }(egret.Sprite));
-__reflect(RebounceObj.prototype, "RebounceObj", ["IFlexible"]);
+__reflect(RebounceObj.prototype, "RebounceObj", ["IFlexible", "IConfigurable"]);
 //# sourceMappingURL=RebounceObj.js.map
