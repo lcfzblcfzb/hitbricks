@@ -1,4 +1,4 @@
-class Bat extends egret.Sprite implements IConfigurable {
+class Bat extends RebounceObj implements IConfigurable{
 	
 	public constructor(stage: egret.DisplayObjectContainer) {
 		super();

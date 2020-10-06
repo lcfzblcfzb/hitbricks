@@ -24,7 +24,11 @@ var Bat = (function (_super) {
         _this.graphics.endFill();
         return _this;
     }
+    //overide
+    Bat.prototype.getName = function () {
+        return BAT;
+    };
     return Bat;
-}(egret.Sprite));
+}(RebounceObj));
 __reflect(Bat.prototype, "Bat");
 //# sourceMappingURL=Bat.js.map

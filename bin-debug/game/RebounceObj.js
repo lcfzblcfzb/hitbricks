@@ -11,7 +11,9 @@ r.prototype = e.prototype, t.prototype = new r();
 var RebounceObj = (function (_super) {
     __extends(RebounceObj, _super);
     function RebounceObj() {
-        return _super.call(this) || this;
+        var _this = _super.call(this) || this;
+        _this.deleteOnHit = false;
+        return _this;
     }
     RebounceObj.prototype.onHit = function (target) {
         //需要传入全局对象得到相对全局坐标的矩形；
@@ -28,14 +30,14 @@ var RebounceObj = (function (_super) {
                 else if (firstP.y == inflateRec.top || firstP.y == inflateRec.bottom) {
                     target.revertYSpeed();
                 }
-                // let idx =GameManager.getInstance().bricks.indexOf(this);
-                // GameManager.getInstance().bricks[idx]=null;
-                var thisIndex = GameManager.getInstance().entityMap[this.getName()].indexOf(this);
-                if (thisIndex >= 0) {
-                    GameManager.getInstance().entityMap[this.getName()].splice(thisIndex, 1);
+                if (this.deleteOnHit) {
+                    var thisIndex = GameManager.getInstance().entityMap[this.getName()].indexOf(this);
+                    if (thisIndex >= 0) {
+                        GameManager.getInstance().entityMap[this.getName()].splice(thisIndex, 1);
+                    }
+                    // GameManager.getInstance().bricks = GameManager.getInstance().bricks.filter(a => a == this);
+                    GameManager.getInstance().stage.removeChild(this);
                 }
-                // GameManager.getInstance().bricks = GameManager.getInstance().bricks.filter(a => a == this);
-                GameManager.getInstance().stage.removeChild(this);
             }
         }
     };

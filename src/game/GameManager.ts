@@ -6,7 +6,6 @@ class GameManager {
 
 	bat: Bat;
 	balls: Ball[] = [];
-	bricks: Array<Brick> = new Array();
 	stage: egret.DisplayObjectContainer;
 	trigger: egret.Shape;
 	entityMap: { [key: number]: Array<IConfigurable> } = {};
@@ -27,21 +26,29 @@ class GameManager {
 		}
 
 	}
-
+	//初始化自身
 	init(stage: egret.DisplayObjectContainer): void {
 		//TODO 初始化
 		this.stage = stage;
 
-		this.bat = new Bat(stage);
+
+		this.stage.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapInitBegin, this);
+	}
+
+	//初始化关卡数据;
+	initStage(stageConfig) {
+
+		this.bat = new Bat(this.stage);
 		this.stage.addChild(this.bat);
 
 		let ball = new Ball(this.bat.x + 50, this.bat.y - 20);
 		this.balls.push(ball);
 		this.stage.addChild(ball);
-
-		let demo = RES.getRes("demo_json");
-
-		for (let config of demo.configurables) {
+		if(stageConfig==null||stageConfig==undefined){
+			console.log("[error] stageConfig not exist!");
+			stageConfig = RES.getRes("demo_json");
+		}
+		for (let config of stageConfig.configurables) {
 			if (getConfigurableByType(config.type) != null) {
 				let configable: IConfigurable = newInstance(getConfigurableByType(config.type), config);
 				this.stage.addChild(configable);
@@ -58,7 +65,6 @@ class GameManager {
 		this.trigger.touchEnabled = true;
 		this.stage.addChild(this.trigger);
 
-		this.stage.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapInitBegin, this);
 	}
 
 	//游戏开始， 初始化速度
@@ -84,8 +90,20 @@ class GameManager {
 			let batRec = this.bat.getTransformedBounds(this.stage);
 
 			if (batRec.intersects(ballRec)) {
-				ball.revertYSpeed();
+				this.bat.onHit(ball);
 			}
+
+			if (this.entityMap[WALL] != null) {
+				for (let wall of this.entityMap[WALL]) {
+
+					let wallRec = wall.getTransformedBounds(this.stage);
+
+					if (wallRec.intersects(ballRec)) {
+						(<Wall>wall).onHit(ball);
+					}
+				}
+			}
+
 
 			if (this.entityMap[BRICK] != null) {
 				for (let brick of this.entityMap[BRICK]) {

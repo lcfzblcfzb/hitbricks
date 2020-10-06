@@ -17,7 +17,7 @@ abstract class RebounceObj extends egret.Sprite implements IFlexible, IConfigura
 				} else if (firstP.y == inflateRec.top || firstP.y == inflateRec.bottom) {
 					target.revertYSpeed();
 				}
-
+				
 				if (this.deleteOnHit) {
 					let thisIndex = GameManager.getInstance().entityMap[this.getName()].indexOf(this);
 					if (thisIndex >= 0) {

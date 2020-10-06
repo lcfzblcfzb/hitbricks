@@ -1,6 +1,11 @@
 {
-  "design": {
-    "height": "768",
-    "width": "1366"
-  }
+    "design": {
+        "height": "768",
+        "width": "1366"
+    },
+    "174fb941418": {
+        "path": "game\\LoginUI.ts",
+        "class": "LoginUI",
+        "parentPath": ""
+    }
 }

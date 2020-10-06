@@ -101,7 +101,7 @@ var Main = (function (_super) {
     };
     Main.prototype.runGame = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var result, userInfo;
+            var result, userInfo, setting;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.loadResource()];
@@ -117,6 +117,16 @@ var Main = (function (_super) {
                         return [4 /*yield*/, platform.getUserInfo()];
                     case 4:
                         userInfo = _a.sent();
+                        //TODO 保存用户数据，取得关卡信息；
+                        if (PlayerMng.getInstance().chap <= 0) {
+                            setting = RES.getRes("game_json");
+                            PlayerMng.getInstance().chap = setting.initChap;
+                            PlayerMng.getInstance().index = setting.initIndex;
+                        }
+                        return [4 /*yield*/, StageMng.getInstance().init()];
+                    case 5:
+                        _a.sent();
+                        GameManager.getInstance().init(this);
                         console.log(userInfo);
                         return [2 /*return*/];
                 }
@@ -165,42 +175,6 @@ var Main = (function (_super) {
     };
     Main.prototype.update = function (timeStamp) {
         GameManager.getInstance().update(timeStamp);
-        // let ball = this.getChildByName("ball");
-        // if (ball != null) {
-        //     ball.x += this.speedX;
-        //     ball.y += this.speedY;
-        //     if (ball.y <= 0 || ball.y > this.height) {
-        //         this.speedY = -this.speedY;
-        //     }
-        //     if (ball.x <= 0 || ball.x > this.width) {
-        //         this.speedX = -this.speedX;
-        //     }
-        //     let ballRec = ball.getTransformedBounds(this);
-        //     let bat = this.getChildByName("bat");
-        //     let batRec = bat.getTransformedBounds(this);
-        //     if (batRec.intersects(ballRec)) {
-        //         this.speedY = -this.speedY;
-        //     }
-        //     let brick = this.getChildByName("brick");
-        //     let brickRec = brick.getTransformedBounds(this);
-        //     if (brickRec.intersects(ballRec)) {
-        //         let inflateRec = brickRec.clone();
-        //         inflateRec.inflate(ball.width / 2, ball.height / 2);//计算出碰撞外壳矩形;
-        //         //计算反弹
-        //         let intersectPoints = this.calcPoints(inflateRec, this.speedY / this.speedX, ball.y - ball.x * this.speedY / this.speedX);
-        //         if (intersectPoints.length > 0) {
-        //             let firstP = this.calcFirstIntersecPoint(intersectPoints);
-        //             if (firstP != null) {
-        //                 if (firstP.x == inflateRec.left || firstP.x == inflateRec.right) {
-        //                     this.speedX = -this.speedX;
-        //                 } else if (firstP.y == inflateRec.top || firstP.y == inflateRec.bottom) {
-        //                     this.speedY = -this.speedY;
-        //                 }
-        //             }
-        //         }
-        //         this.removeChild(brick);
-        //     }
-        // }
         return false;
     };
     /**
@@ -208,7 +182,9 @@ var Main = (function (_super) {
      * Create scene interface
      */
     Main.prototype.createGameScene = function () {
-        GameManager.getInstance().init(this);
+        //TODO 选关卡等等；
+        var ui = new LoginUI();
+        this.addChild(ui);
     };
     /**
      * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。

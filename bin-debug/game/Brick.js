@@ -18,6 +18,7 @@ var Brick = (function (_super) {
         _this.graphics.beginFill(config.color, 1);
         _this.graphics.drawRect(0, 0, config.width, config.height);
         _this.graphics.endFill();
+        _this.deleteOnHit = true;
         return _this;
     }
     Brick.prototype.getName = function () {

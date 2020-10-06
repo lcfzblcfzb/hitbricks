@@ -41,7 +41,11 @@ var Ball = (function (_super) {
     Ball.prototype.revertYSpeed = function () {
         this.speedY = -this.speedY;
     };
+    //override
+    Ball.prototype.getName = function () {
+        return BALL;
+    };
     return Ball;
 }(egret.Sprite));
-__reflect(Ball.prototype, "Ball", ["IMovable"]);
+__reflect(Ball.prototype, "Ball", ["IMovable", "IConfigurable"]);
 //# sourceMappingURL=Ball.js.map
