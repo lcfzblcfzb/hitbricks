@@ -24,6 +24,8 @@ var LoginUI = (function (_super) {
     LoginUI.prototype.onStart = function (e) {
         if (e.target.id = "playBtn") {
             GameManager.getInstance().initStage(StageMng.getInstance().getCurrentStage());
+            this.visible = false;
+            // this.enabled = false;
         }
     };
     return LoginUI;

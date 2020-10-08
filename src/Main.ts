@@ -72,7 +72,7 @@ class Main extends eui.UILayer {
             PlayerMng.getInstance().index =setting.initIndex;
         }
         await  StageMng.getInstance().init();
-        GameManager.getInstance().init(this);
+        GameManager.getInstance().init(this.gameGroup);
 
         console.log(userInfo);
     }
@@ -112,6 +112,10 @@ class Main extends eui.UILayer {
     }
 
     UIlayer = this;
+    //游戏group,每一局都会重置;
+    gameGroup:eui.Group;
+    //关卡选择UI;
+    loginUI:eui.Component;
 
     private textfield: egret.TextField;
     /**
@@ -119,9 +123,14 @@ class Main extends eui.UILayer {
      * Create scene interface
      */
     protected createGameScene(): void {
-        //TODO 选关卡等等；
-        let ui = new LoginUI();
-        this.addChild(ui);
+        
+        this.gameGroup = new eui.Group();
+        this.gameGroup.width = this.width;
+        this.gameGroup.height = this.height;
+        this.addChild(this.gameGroup);
+        // 选关卡等等；
+        this.loginUI = new LoginUI();
+        this.addChild(this.loginUI);
     }
     /**
      * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。

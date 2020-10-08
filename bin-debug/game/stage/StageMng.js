@@ -50,7 +50,9 @@ var StageMng = (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, RES.loadGroup("stage", 8).then(function () {
+                    case 0: 
+                    //异步加载关卡数据
+                    return [4 /*yield*/, RES.loadGroup("stage", 8).then(function () {
                             var items = RES.getGroupByName("stage");
                             for (var _i = 0, items_1 = items; _i < items_1.length; _i++) {
                                 var item = items_1[_i];
@@ -60,6 +62,7 @@ var StageMng = (function () {
                             }
                         })];
                     case 1:
+                        //异步加载关卡数据
                         _a.sent();
                         return [2 /*return*/];
                 }
@@ -81,6 +84,12 @@ var StageMng = (function () {
     StageMng.prototype.getCurrentStage = function () {
         var key = StageMng.createKey(PlayerMng.getInstance().chap, PlayerMng.getInstance().index);
         return this.stageMap[key];
+    };
+    StageMng.prototype.getNextStage = function () {
+        return null;
+    };
+    StageMng.prototype.isLastStage = function () {
+        return false;
     };
     StageMng.stageMng = new StageMng();
     return StageMng;

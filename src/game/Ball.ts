@@ -23,12 +23,13 @@ class Ball extends egret.Sprite implements IMovable,IConfigurable {
 		this.y += this.speedY;
 
 		if (this.y <= 0 || this.y > this.backStage.height) {
-			this.speedY = -this.speedY;
+			this.speedY = -this.speedY;	
 		}
 		if (this.x <= 0 || this.x > this.backStage.width) {
 			this.speedX = -this.speedX;
 		}
-
+		console.log(this.x+";"+this.y+";"+this.speedX+";"+this.speedY);
+		
 	}
 
 	revertXSpeed(): void {

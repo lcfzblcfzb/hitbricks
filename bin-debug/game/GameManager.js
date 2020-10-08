@@ -24,10 +24,45 @@ var GameManager = (function () {
     GameManager.prototype.init = function (stage) {
         //TODO 初始化
         this.stage = stage;
-        this.stage.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapInitBegin, this);
+        this.stage.addEventListener(GameProcessEvent.STAGE_END, this.stageSuccess, this);
+    };
+    //完成关卡
+    GameManager.prototype.stageSuccess = function () {
+        console.log("stage success");
+        if (StageMng.getInstance().isLastStage()) {
+            //游戏结束；
+        }
+        else {
+            //下一关
+            this.initStage(StageMng.getInstance().getNextStage());
+        }
+    };
+    //是否关卡成功完成
+    GameManager.prototype.isStageSuccess = function () {
+        return false;
+    };
+    //是否关卡失败
+    GameManager.prototype.isStageFail = function () {
+        return false;
+    };
+    //关卡失败结束
+    GameManager.prototype.stageFail = function () {
+        //TODO gameOver
+    };
+    /**
+     * 重置下参数
+     */
+    GameManager.prototype._resetFields = function () {
+        this.balls = [];
+        this.entityMap = {};
+        this.trigger = null;
+        this.bat = null;
+        this.stage.removeChildren();
     };
     //初始化关卡数据;
     GameManager.prototype.initStage = function (stageConfig) {
+        //重置下关卡
+        this._resetFields();
         this.bat = new Bat(this.stage);
         this.stage.addChild(this.bat);
         var ball = new Ball(this.bat.x + 50, this.bat.y - 20);
@@ -54,13 +89,14 @@ var GameManager = (function () {
         this.trigger.y = this.bat.y;
         this.trigger.touchEnabled = true;
         this.stage.addChild(this.trigger);
+        this.stage.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapInitBegin, this);
     };
     //游戏开始， 初始化速度
     GameManager.prototype.onTouchTapInitBegin = function (evt) {
         egret.log("on onTouchTapInitBegin begin");
         for (var _i = 0, _a = this.balls; _i < _a.length; _i++) {
             var ball = _a[_i];
-            ball.speedY = -3;
+            ball.speedY = -6;
             ball.speedX = 0;
         }
         this.stage.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapInitBegin, this);
@@ -92,6 +128,9 @@ var GameManager = (function () {
                     var brickRec = brick.getTransformedBounds(this.stage);
                     if (brickRec.intersects(ballRec)) {
                         brick.onHit(ball);
+                        if (this.isStageSuccess()) {
+                            this.stageSuccess();
+                        }
                     }
                 }
             }
@@ -101,6 +140,10 @@ var GameManager = (function () {
     GameManager.prototype.onTouchTapPlaying = function (evt) {
         if (this.bat != null) {
             this.bat.x = evt.stageX;
+            var originRec = this.bat.getTransformedBounds(GameManager.getInstance().stage);
+            var inflateRec = originRec.clone();
+            inflateRec.inflate(this.balls[0].width / 2, this.balls[0].height / 2); //计算出碰撞外壳矩形;
+            console.log(inflateRec.left + ";" + inflateRec.right + ";" + inflateRec.top + ";" + inflateRec.bottom);
         }
     };
     GameManager.gm = new GameManager();

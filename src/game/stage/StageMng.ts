@@ -9,6 +9,7 @@ class StageMng {
 	}
 
 	async init(){
+		//异步加载关卡数据
 		await RES.loadGroup("stage", 8).then(()=>{
 			let items=RES.getGroupByName("stage");
 			for(let item of items){
@@ -39,6 +40,14 @@ class StageMng {
 	public getCurrentStage():Object{
 		let key =StageMng.createKey(PlayerMng.getInstance().chap,PlayerMng.getInstance().index);
 		return this.stageMap[key];
+	}
+
+	public getNextStage():Object{
+		return null;
+	}
+
+	public isLastStage():boolean{
+		return false;
 	}
 
 }

@@ -8,7 +8,7 @@ abstract class RebounceObj extends egret.Sprite implements IFlexible, IConfigura
 
 		inflateRec.inflate(target.width / 2, target.height / 2);//计算出碰撞外壳矩形;
 		//计算反弹
-		let intersectPoints = this.calcPoints(inflateRec, target.speedY / target.speedX, target.y - target.x * target.speedY / target.speedX);
+		let intersectPoints = this.calcPoints(inflateRec, target);
 		if (intersectPoints.length > 0) {
 			let firstP = this.calcFirstIntersecPoint(intersectPoints, target);
 			if (firstP != null) {
@@ -17,7 +17,7 @@ abstract class RebounceObj extends egret.Sprite implements IFlexible, IConfigura
 				} else if (firstP.y == inflateRec.top || firstP.y == inflateRec.bottom) {
 					target.revertYSpeed();
 				}
-				
+
 				if (this.deleteOnHit) {
 					let thisIndex = GameManager.getInstance().entityMap[this.getName()].indexOf(this);
 					if (thisIndex >= 0) {
@@ -37,30 +37,49 @@ abstract class RebounceObj extends egret.Sprite implements IFlexible, IConfigura
 	}
 
 	//计算直线与矩形的交点
-	private calcPoints(rec: egret.Rectangle, k: number, b: number): egret.Point[] {
+	protected calcPoints(rec: egret.Rectangle, target: IMovable): egret.Point[] {
 		let result: egret.Point[] = [];
+		let finalResult: egret.Point[] = [];
 
 		let left = rec.left;
 		let bottom = rec.bottom;
 		let right = rec.right;
 		let top = rec.top;
 
-		//需要特殊处理 垂直的情况
-		if (k != Number.POSITIVE_INFINITY) {
-			let leftPoint = new egret.Point(left, k * left + b);
-			let rightPoint = new egret.Point(right, k * right + b);
-			result.push(leftPoint);
-			result.push(rightPoint);
-		}
-		//平行的情况则不处理
-		if (k != 0) {
-			let topPoint = new egret.Point((top - b) / k, top);
-			let bottomPoint = new egret.Point((bottom - b) / k, bottom);
+		if (target.speedX != 0) {
+			let k = target.speedY / target.speedX;
+			let b = target.y - target.x * k;
+			//先计算函数交点（即矩形的4条边当作直线处理）
+			//需要特殊处理 垂直的情况
+			if (k != Number.POSITIVE_INFINITY && k != Number.NEGATIVE_INFINITY) {
+				let leftPoint = new egret.Point(left, k * left + b);
+				let rightPoint = new egret.Point(right, k * right + b);
+				if (leftPoint.equals(rightPoint)) {
+					result.push(leftPoint);
+				} else {
+					result.push(leftPoint);
+					result.push(rightPoint);
+				}
+			}
+			//平行的情况则不处理
+			if (k != 0) {
+				let topPoint = new egret.Point((top - b) / k, top);
+				let bottomPoint = new egret.Point((bottom - b) / k, bottom);
+				if (topPoint.equals(bottomPoint)) {
+					result.push(topPoint);
+				} else {
+					result.push(topPoint);
+					result.push(bottomPoint);
+				}
+			}
+		} else {
+			//speedX =0 ，轨迹是一条垂线，只计算上下两个触点
+			let topPoint = new egret.Point(target.x, top);
+			let bottomPoint = new egret.Point(target.x, bottom);
 			result.push(topPoint);
 			result.push(bottomPoint);
 		}
 
-		let finalResult: egret.Point[] = [];
 		for (let p of result) {
 			if (!(p.x < left || p.x > right || p.y < top || p.y > bottom)) {
 				finalResult.push(p);
@@ -70,7 +89,7 @@ abstract class RebounceObj extends egret.Sprite implements IFlexible, IConfigura
 	}
 
 	//计算第一个碰撞点
-	private calcFirstIntersecPoint(points: egret.Point[], target: IMovable): egret.Point {
+	protected calcFirstIntersecPoint(points: egret.Point[], target: IMovable): egret.Point {
 
 		if (points.length < 2)
 			return null;
@@ -80,11 +99,11 @@ abstract class RebounceObj extends egret.Sprite implements IFlexible, IConfigura
 
 		let kBall = Number.POSITIVE_INFINITY;
 		if (target.speedX != 0) {
-			target.speedY / target.speedX;
+			kBall = target.speedY / target.speedX;
 		}
 		let k = Number.POSITIVE_INFINITY;
 		if (p2.x != p1.x) {
-			let k = (p2.y - p1.y) / (p2.x - p1.x);
+			k = (p2.y - p1.y) / (p2.x - p1.x);
 		}
 
 		if (kBall == Number.POSITIVE_INFINITY && k == Number.POSITIVE_INFINITY) {
@@ -92,10 +111,17 @@ abstract class RebounceObj extends egret.Sprite implements IFlexible, IConfigura
 		} else if (kBall == Number.POSITIVE_INFINITY || k == Number.POSITIVE_INFINITY) {
 			return null;
 		} else {
-			if (kBall == k) {
-				return p1;//斜率相同，p1->p2;
-			} else if (kBall == -k) {
-				return p2;//相反，p2->p1;
+			if (kBall * k > 0) {
+				//如果是在内部（可能出现），判断下坐标
+				if(target.x>p1.x){
+					return p2;
+				}
+				return p1;//斜率方向相同，p1->p2;
+			} else if (kBall * k < 0) {
+				if(target.x<p2.x){
+					return p1;
+				}
+				return p2;//方向相反，p2->p1;
 			} else {
 				return null;
 			}

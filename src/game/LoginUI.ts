@@ -17,6 +17,8 @@ class LoginUI extends eui.Component implements eui.UIComponent {
 	private onStart(e: egret.TouchEvent): void {
 		if (e.target.id = "playBtn") {
 			GameManager.getInstance().initStage(StageMng.getInstance().getCurrentStage());
+			this.visible = false;
+			// this.enabled = false;
 		}
 	}
 

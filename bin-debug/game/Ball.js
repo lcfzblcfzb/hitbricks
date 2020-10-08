@@ -34,6 +34,7 @@ var Ball = (function (_super) {
         if (this.x <= 0 || this.x > this.backStage.width) {
             this.speedX = -this.speedX;
         }
+        console.log(this.x + ";" + this.y + ";" + this.speedX + ";" + this.speedY);
     };
     Ball.prototype.revertXSpeed = function () {
         this.speedX = -this.speedX;

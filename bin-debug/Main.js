@@ -126,7 +126,7 @@ var Main = (function (_super) {
                         return [4 /*yield*/, StageMng.getInstance().init()];
                     case 5:
                         _a.sent();
-                        GameManager.getInstance().init(this);
+                        GameManager.getInstance().init(this.gameGroup);
                         console.log(userInfo);
                         return [2 /*return*/];
                 }
@@ -182,9 +182,13 @@ var Main = (function (_super) {
      * Create scene interface
      */
     Main.prototype.createGameScene = function () {
-        //TODO 选关卡等等；
-        var ui = new LoginUI();
-        this.addChild(ui);
+        this.gameGroup = new eui.Group();
+        this.gameGroup.width = this.width;
+        this.gameGroup.height = this.height;
+        this.addChild(this.gameGroup);
+        // 选关卡等等；
+        this.loginUI = new LoginUI();
+        this.addChild(this.loginUI);
     };
     /**
      * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
