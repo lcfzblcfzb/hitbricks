@@ -1,15 +1,25 @@
 {
 	"groups": [
 		{
-			"keys": "checkbox_select_disabled_png,checkbox_select_down_png,checkbox_select_up_png,checkbox_unselect_png,selected_png,border_png,header_png,radiobutton_select_disabled_png,radiobutton_select_down_png,radiobutton_select_up_png,radiobutton_unselect_png,roundthumb_png,thumb_png,track_png,tracklight_png,handle_png,off_png,on_png,button_down_png,button_up_png,thumb_pb_png,track_pb_png,track_sb_png,bg_jpg,egret_icon_png,description_json,game_json",
+			"keys": "button_down_png,button_up_png,checkbox_select_disabled_png,checkbox_select_down_png,checkbox_select_up_png,checkbox_unselect_png,egret_icon_png,selected_png,border_png,header_png,thumb_pb_png,track_pb_png,radiobutton_select_disabled_png,radiobutton_select_down_png,radiobutton_select_up_png,radiobutton_unselect_png,roundthumb_png,track_sb_png,thumb_png,track_png,tracklight_png,handle_png,off_png,on_png,description_json,myGame_json,demo_json,dataSaveAs1_1_json,BG_COMMON,initball_png,MovieClips_json,MovieClips_png,SpriteSheet_json",
 			"name": "preload"
 		},
 		{
-			"keys": "demo_json",
+			"keys": "demo_json,dataSaveAs1_1_json,dataSaveAs1_2_json,dataSaveAs1_3_json",
 			"name": "stage"
 		}
 	],
 	"resources": [
+		{
+			"url": "assets/Button/button_down.png",
+			"type": "image",
+			"name": "button_down_png"
+		},
+		{
+			"url": "assets/Button/button_up.png",
+			"type": "image",
+			"name": "button_up_png"
+		},
 		{
 			"url": "assets/CheckBox/checkbox_select_disabled.png",
 			"type": "image",
@@ -31,6 +41,11 @@
 			"name": "checkbox_unselect_png"
 		},
 		{
+			"url": "assets/egret_icon.png",
+			"type": "image",
+			"name": "egret_icon_png"
+		},
+		{
 			"url": "assets/ItemRenderer/selected.png",
 			"type": "image",
 			"name": "selected_png"
@@ -44,6 +59,16 @@
 			"url": "assets/Panel/header.png",
 			"type": "image",
 			"name": "header_png"
+		},
+		{
+			"url": "assets/ProgressBar/thumb_pb.png",
+			"type": "image",
+			"name": "thumb_pb_png"
+		},
+		{
+			"url": "assets/ProgressBar/track_pb.png",
+			"type": "image",
+			"name": "track_pb_png"
 		},
 		{
 			"url": "assets/RadioButton/radiobutton_select_disabled.png",
@@ -69,6 +94,11 @@
 			"url": "assets/ScrollBar/roundthumb.png",
 			"type": "image",
 			"name": "roundthumb_png"
+		},
+		{
+			"url": "assets/ScrollBar/track_sb.png",
+			"type": "image",
+			"name": "track_sb_png"
 		},
 		{
 			"url": "assets/Slider/thumb.png",
@@ -101,54 +131,60 @@
 			"name": "on_png"
 		},
 		{
-			"url": "assets/Button/button_down.png",
-			"type": "image",
-			"name": "button_down_png"
-		},
-		{
-			"url": "assets/Button/button_up.png",
-			"type": "image",
-			"name": "button_up_png"
-		},
-		{
-			"url": "assets/ProgressBar/thumb_pb.png",
-			"type": "image",
-			"name": "thumb_pb_png"
-		},
-		{
-			"url": "assets/ProgressBar/track_pb.png",
-			"type": "image",
-			"name": "track_pb_png"
-		},
-		{
-			"url": "assets/ScrollBar/track_sb.png",
-			"type": "image",
-			"name": "track_sb_png"
-		},
-		{
-			"url": "assets/bg.jpg",
-			"type": "image",
-			"name": "bg_jpg"
-		},
-		{
-			"url": "assets/egret_icon.png",
-			"type": "image",
-			"name": "egret_icon_png"
-		},
-		{
 			"url": "config/description.json",
 			"type": "json",
 			"name": "description_json"
 		},
 		{
-			"url": "config/game.json",
+			"url": "gameConfig/myGame.json",
 			"type": "json",
-			"name": "game_json"
+			"name": "myGame_json"
 		},
 		{
 			"url": "stage/demo.json",
 			"type": "json",
 			"name": "demo_json"
+		},
+		{
+			"url": "stage/dataSaveAs1_1.json",
+			"type": "json",
+			"name": "dataSaveAs1_1_json"
+		},
+		{
+			"url": "assets/BG_COMMON.png",
+			"type": "image",
+			"name": "BG_COMMON"
+		},
+		{
+			"url": "assets/initball.png",
+			"type": "image",
+			"name": "initball_png"
+		},
+		{
+			"url": "stage/dataSaveAs1_3.json",
+			"type": "json",
+			"name": "dataSaveAs1_3_json"
+		},
+		{
+			"url": "stage/dataSaveAs1_2.json",
+			"type": "json",
+			"name": "dataSaveAs1_2_json"
+		},
+		{
+			"url": "assets/MovieClips.json",
+			"type": "json",
+			"name": "MovieClips_json"
+		},
+		{
+			"url": "assets/MovieClips.png",
+			"type": "image",
+			"name": "MovieClips_png"
+		},
+		{
+			"url": "assets/SpriteSheet.json",
+			"type": "sheet",
+			"name": "SpriteSheet_json",
+			"subkeys": "BG_COMMON_SKY,BRICK_GIRL,BRICK_PEOPLE,BRICK_TSHIRT,ball"
 		}
 	]
 }

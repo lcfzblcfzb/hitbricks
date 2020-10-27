@@ -5,12 +5,16 @@ class Bat extends RebounceObj implements IConfigurable {
 		let stageW = stage.stage.stageWidth;
 		let stageH = stage.stage.stageHeight;
 		this.name = "bat";
-		this.graphics.beginFill(0x000079, 1);
-		this.graphics.drawRect(0, 0, 100, 10);
-		this.width = 100;
-		this.height = 10;
-		this.x = stageW / 2 - 50;
+
+		let config =RES.getRes("myGame_json");
+
+		this.graphics.beginFill(parseInt(config.batColor), 1);
+		this.graphics.drawRect(0, 0, config.batWidth, config.batHeight);
+		this.width = config.batWidth;
+		this.height = config.batHeight;
+		this.x = stageW / 2;
 		this.y = stageH * 0.8;
+		this.anchorOffsetX = this.width/2;
 		this.graphics.endFill();
 	}
 	//overide
@@ -26,17 +30,14 @@ class Bat extends RebounceObj implements IConfigurable {
 		inflateRec.inflate(target.width / 2, target.height / 2);//计算出碰撞外壳矩形;
 		//计算反弹
 		let intersectPoints = this.calcPoints(inflateRec, target);
-		console.log(intersectPoints.length);
 
 		if (intersectPoints.length > 0) {
 			let firstP = this.calcFirstIntersecPoint(intersectPoints, target);
-			console.log(firstP);
 
  			if (firstP != null) {
 				if (firstP.x == inflateRec.left || firstP.x == inflateRec.right) {
-					console.log("reverting x speed");
 					
-					target.revertXSpeed();
+					target.resetXSpeed(firstP.x == inflateRec.right);
 				} else if (firstP.y == inflateRec.top || firstP.y == inflateRec.bottom) {
 					//当碰撞发生在板子上，根据碰撞点，对x 方向速度做不同比例的变化,距离中心越远，变化率越大
 
@@ -63,7 +64,7 @@ class Bat extends RebounceObj implements IConfigurable {
 						}
 					}else{
 						//如果刚好是中心点
-						target.revertYSpeed();
+						target.resetYSpeed(false);
 					}
 				}
 

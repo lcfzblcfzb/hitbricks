@@ -13,15 +13,16 @@ r.prototype = e.prototype, t.prototype = new r();
  */
 var GameProcessEvent = (function (_super) {
     __extends(GameProcessEvent, _super);
-    function GameProcessEvent(type, bubble, cancelable) {
-        if (bubble === void 0) { bubble = false; }
+    function GameProcessEvent(type, cancelable) {
         if (cancelable === void 0) { cancelable = false; }
-        return _super.call(this, type, bubble, cancelable) || this;
+        return _super.call(this, type, true, cancelable) || this;
     }
     GameProcessEvent.GAME_START = "GAME_START";
     GameProcessEvent.STAGE_START = "STAGE_START";
     GameProcessEvent.STAGE_END = "STAGE_END";
     GameProcessEvent.GAME_END = "GAME_END";
+    GameProcessEvent.STAGE_PAUSED = "STAGE_PAUSED";
+    GameProcessEvent.STAGE_RETURN = "STAGE_RETURN";
     return GameProcessEvent;
 }(egret.Event));
 __reflect(GameProcessEvent.prototype, "GameProcessEvent");

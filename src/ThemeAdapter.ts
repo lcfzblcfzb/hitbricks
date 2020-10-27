@@ -38,6 +38,7 @@ class ThemeAdapter implements eui.IThemeAdapter {
      * @param thisObject 回调的this引用
      */
     public getTheme(url: string, onSuccess: Function, onError: Function, thisObject: any): void {
+
         function onResGet(e: string): void {
             onSuccess.call(thisObject, e);
         }

@@ -86,10 +86,27 @@ var StageMng = (function () {
         return this.stageMap[key];
     };
     StageMng.prototype.getNextStage = function () {
-        return null;
+        if (this.isLastStage()) {
+            return false;
+        }
+        else {
+            var key = StageMng.createKey(PlayerMng.getInstance().chap, PlayerMng.getInstance().index + 1);
+            var nextStage = this.stageMap[key];
+            if (nextStage == null) {
+                var key_1 = StageMng.createKey(PlayerMng.getInstance().chap + 1, 1);
+                nextStage = this.stageMap[key_1];
+            }
+            return nextStage;
+        }
     };
     StageMng.prototype.isLastStage = function () {
-        return false;
+        var key = StageMng.createKey(PlayerMng.getInstance().chap, PlayerMng.getInstance().index + 1);
+        var nextStage = this.stageMap[key];
+        if (nextStage == null) {
+            var key_2 = StageMng.createKey(PlayerMng.getInstance().chap + 1, 1);
+            nextStage = this.stageMap[key_2];
+        }
+        return nextStage == null;
     };
     StageMng.stageMng = new StageMng();
     return StageMng;

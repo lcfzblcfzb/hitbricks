@@ -2,7 +2,7 @@
 ///<reference path="api.d.ts"/>
 
 import * as path from 'path';
-import { UglifyPlugin, CompilePlugin, ManifestPlugin, ExmlPlugin, EmitResConfigFilePlugin, TextureMergerPlugin, CleanPlugin } from 'built-in';
+import { UglifyPlugin, CompilePlugin, ManifestPlugin, ExmlPlugin, EmitResConfigFilePlugin, TextureMergerPlugin, CleanPlugin, ResSplitPlugin } from 'built-in';
 import { WxgamePlugin } from './wxgame/wxgame';
 import { CustomPlugin } from './myplugin';
 import * as defaultConfig from './config';
@@ -37,15 +37,20 @@ const config: ResourceManagerConfig = {
                     new WxgamePlugin(useWxPlugin),
                     new UglifyPlugin([
                         // 使用 EUI 项目，要压缩皮肤文件，可以开启这个压缩配置
-                        // {
-                        //     sources: ["resource/default.thm.js"],
-                        //     target: "default.thm.min.js"
-                        // },
+                        {
+                            sources: ["resource/default.thm.js"],
+                            target: "default.thm.min.js"
+                        },
                         {
                             sources: ["main.js"],
                             target: "main.min.js"
                         }
-                    ]),
+                    ]), new ResSplitPlugin({
+                        matchers: [
+                            { from: "resource/**", to: `../${projectName}_wxgame_remote` }
+                        ]
+                    }),
+
                     new ManifestPlugin({ output: 'manifest.js', useWxPlugin: useWxPlugin })
                 ]
             }

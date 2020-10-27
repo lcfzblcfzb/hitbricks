@@ -1,23 +1,33 @@
-interface IConfigurable extends egret.Sprite {    
-    getName():string;  
+interface IConfigurable extends egret.Sprite {
+    getName(): string;
 }
 
-interface IConfigurableConstructor{
-    new ( config:any):IConfigurable;
+interface IConfigurableConstructor {
+    new (config: any): IConfigurable;
 }
 
 
-function newInstance(con:IConfigurableConstructor,config:any):IConfigurable{
+function newInstance(con: IConfigurableConstructor, config: any): IConfigurable {
     return new con(config);
 }
 
-let configuableMap: { [key: string]: IConfigurableConstructor }={100:Brick};
+function getConfigurableByType(type: number): IConfigurableConstructor {
 
-function getConfigurableByType(type:number):IConfigurableConstructor{
-    return configuableMap[type];
+    let name = type2nameMap[type];
+    if(name){
+        return configuableMap[name];
+    }else{
+        console.log("no cofiguarable found.type:"+type);
+        return null;
+    }
+    
 }
 
-const BRICK ="brick";
-const WALL ="wall";
+const BRICK = "brick";
+const WALL = "wall";
 const BAT = "bat";
-const BALL ="ball";
+const BALL = "ball";
+//将配置文件的type 映射到 name 上；
+let type2nameMap: { [key: number]: string } = { 100: BRICK, 200: WALL };
+// 将name 映射到 构造器上；
+let configuableMap: { [key: string]: IConfigurableConstructor } = { [BRICK]: Brick, [WALL]: Wall };

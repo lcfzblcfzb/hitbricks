@@ -13,21 +13,25 @@
 	"game": [
 		"bin-debug/game/RebounceObj.js",
 		"bin-debug/game/Brick.js",
-		"bin-debug/game/IConfigurable.js",
-		"bin-debug/Platform.js",
+		"bin-debug/game/Wall.js",
+		"bin-debug/game/IFlexible.js",
 		"bin-debug/ThemeAdapter.js",
 		"bin-debug/game/Ball.js",
 		"bin-debug/game/Bat.js",
+		"bin-debug/game/Bmob.js",
 		"bin-debug/AssetAdapter.js",
 		"bin-debug/game/GameManager.js",
+		"bin-debug/game/IConfigurable.js",
 		"bin-debug/LoadingUI.js",
-		"bin-debug/game/IFlexible.js",
 		"bin-debug/game/IMovable..js",
 		"bin-debug/game/LoginUI.js",
 		"bin-debug/Main.js",
-		"bin-debug/game/Wall.js",
+		"bin-debug/game/Utils.js",
+		"bin-debug/Platform.js",
 		"bin-debug/game/event/GameProcessEvent.js",
 		"bin-debug/game/player/PlayerMng.js",
-		"bin-debug/game/stage/StageMng.js"
+		"bin-debug/game/spell/ISpell.js",
+		"bin-debug/game/stage/StageMng.js",
+		"bin-debug/game/ui/gifUI.js"
 	]
 }

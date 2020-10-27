@@ -1,31 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////////////
-//
-//  Copyright (c) 2014-present, Egret Technology.
-//  All rights reserved.
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions are met:
-//
-//     * Redistributions of source code must retain the above copyright
-//       notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright
-//       notice, this list of conditions and the following disclaimer in the
-//       documentation and/or other materials provided with the distribution.
-//     * Neither the name of the Egret nor the
-//       names of its contributors may be used to endorse or promote products
-//       derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY EGRET AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
-//  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL EGRET AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-//  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA,
-//  OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-//  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-//  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-//  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-//////////////////////////////////////////////////////////////////////////////////////
 var __reflect = (this && this.__reflect) || function (p, c, t) {
     p.__class__ = c, t ? t.push(c) : t = [c], p.__types__ = p.__types__ ? t.concat(p.__types__) : t;
 };
@@ -71,6 +43,37 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+//////////////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright (c) 2014-present, Egret Technology.
+//  All rights reserved.
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions are met:
+//
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the Egret nor the
+//       names of its contributors may be used to endorse or promote products
+//       derived from this software without specific prior written permission.
+//
+//  THIS SOFTWARE IS PROVIDED BY EGRET AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+//  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+//  IN NO EVENT SHALL EGRET AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+//  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA,
+//  OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+//  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+//  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+//  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//////////////////////////////////////////////////////////////////////////////////////
+// declare const Bmob: any;
+//游戏实际的宽高比
+var GAME_RATIO = 0.6;
 var Main = (function (_super) {
     __extends(Main, _super);
     function Main() {
@@ -79,6 +82,7 @@ var Main = (function (_super) {
         return _this;
     }
     Main.prototype.createChildren = function () {
+        var _this = this;
         _super.prototype.createChildren.call(this);
         egret.lifecycle.addLifecycleListener(function (context) {
             // custom lifecycle plugin
@@ -94,40 +98,75 @@ var Main = (function (_super) {
         var assetAdapter = new AssetAdapter();
         egret.registerImplementation("eui.IAssetAdapter", assetAdapter);
         egret.registerImplementation("eui.IThemeAdapter", new ThemeAdapter());
+        this.addEventListener(egret.Event.RESIZE, function (e) {
+            console.log("in resize");
+            console.log("windowwidth:" + window.innerWidth);
+            console.log("windowheight:" + window.innerHeight);
+            console.log("stagewidth:" + _this.stage.width);
+            console.log("stageheight:" + _this.stage.height);
+        }, this);
         var self = this;
         this.runGame().catch(function (e) {
             console.log(e);
-        }).then(function () { return egret.startTick(self.update, self); });
+        }).then(function () {
+            return egret.startTick(self.update, self);
+        });
     };
     Main.prototype.runGame = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var result, userInfo, setting;
+            var _this = this;
+            var result, setting, init;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.loadResource()];
                     case 1:
                         _a.sent();
-                        this.createGameScene();
-                        return [4 /*yield*/, RES.getResAsync("description_json")];
+                        return [4 /*yield*/, this.createGameScene()];
                     case 2:
+                        _a.sent();
+                        return [4 /*yield*/, RES.getResAsync("description_json")];
+                    case 3:
                         result = _a.sent();
                         return [4 /*yield*/, platform.login()];
-                    case 3:
-                        _a.sent();
-                        return [4 /*yield*/, platform.getUserInfo()];
                     case 4:
-                        userInfo = _a.sent();
-                        //TODO 保存用户数据，取得关卡信息；
+                        _a.sent();
+                        return [4 /*yield*/, RES.getResAsync("myGame_json")];
+                    case 5:
+                        setting = _a.sent();
                         if (PlayerMng.getInstance().chap <= 0) {
-                            setting = RES.getRes("game_json");
+                            //初始化为第一关；
+                            GameManager.getInstance().init(this.gameGroup, setting);
                             PlayerMng.getInstance().chap = setting.initChap;
                             PlayerMng.getInstance().index = setting.initIndex;
                         }
                         return [4 /*yield*/, StageMng.getInstance().init()];
-                    case 5:
-                        _a.sent();
-                        GameManager.getInstance().init(this.gameGroup);
-                        console.log(userInfo);
+                    case 6:
+                        init = _a.sent();
+                        this.loginUI.updateStageIndex();
+                        //游戏结束
+                        this.addEventListener(GameProcessEvent.GAME_END, function () {
+                            _this.loginUI.visible = true;
+                            _this.gameGroup.mask = _this.gameGroupMask;
+                            PlayerMng.getInstance().chap = setting.initChap;
+                            PlayerMng.getInstance().index = setting.initIndex;
+                            _this.loginUI.updateStageIndex();
+                        }, this);
+                        //游戏开始
+                        this.addEventListener(GameProcessEvent.STAGE_START, function () {
+                            _this.loginUI.visible = false;
+                            _this.gameGroup.mask = null;
+                        }, this);
+                        //游戏暂停
+                        this.addEventListener(GameProcessEvent.STAGE_PAUSED, function () {
+                            _this.loginUI.visible = true;
+                            _this.loginUI.updateStageIndex();
+                            _this.gameGroup.mask = _this.gameGroupMask;
+                        }, this);
+                        //游戏暂停返回
+                        this.addEventListener(GameProcessEvent.STAGE_RETURN, function () {
+                            _this.loginUI.visible = false;
+                            _this.gameGroup.mask = null;
+                        }, this);
                         return [2 /*return*/];
                 }
             });
@@ -135,22 +174,30 @@ var Main = (function (_super) {
     };
     Main.prototype.loadResource = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var loadingView, e_1;
+            var loadingView, pic, json, mcFactory, e_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 4, , 5]);
                         loadingView = new LoadingUI();
                         this.stage.addChild(loadingView);
+                        // await RES.loadConfig("default.res.json", "http://139.155.27.151:8080/res/resource/").catch((err) => {
+                        // });
                         return [4 /*yield*/, RES.loadConfig("resource/default.res.json", "resource/")];
                     case 1:
-                        _a.sent();
-                        return [4 /*yield*/, this.loadTheme()];
-                    case 2:
+                        // await RES.loadConfig("default.res.json", "http://139.155.27.151:8080/res/resource/").catch((err) => {
+                        // });
                         _a.sent();
                         return [4 /*yield*/, RES.loadGroup("preload", 0, loadingView)];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, this.loadTheme()];
                     case 3:
                         _a.sent();
+                        pic = RES.getRes("MovieClips_png");
+                        json = RES.getRes("MovieClips_json");
+                        mcFactory = new egret.MovieClipDataFactory(json, pic);
+                        this.stage['mcFactory'] = mcFactory;
                         this.stage.removeChild(loadingView);
                         return [3 /*break*/, 5];
                     case 4:
@@ -167,13 +214,21 @@ var Main = (function (_super) {
         return new Promise(function (resolve, reject) {
             // load skin theme configuration file, you can manually modify the file. And replace the default skin.
             //加载皮肤主题配置文件,可以手动修改这个文件。替换默认皮肤。
-            var theme = new eui.Theme("resource/default.thm.json", _this.stage);
+            // let theme = new eui.Theme("resource/default.thm.json", this.stage);
+            // theme.addEventListener(eui.UIEvent.COMPLETE, () => {
+            //     resolve();
+            // }, this);
+            egret.ImageLoader.crossOrigin = "anonymous"; //设置允许跨域加载
+            // load skin theme configuration file, you can manually modify the file. And replace the default skin.
+            //加载皮肤主题配置文件,可以手动修改这个文件。替换默认皮肤。
+            var theme = new eui.Theme("resource/default.thm.json", _this.stage); //这里要填入服务器的ip地址
             theme.addEventListener(eui.UIEvent.COMPLETE, function () {
                 resolve();
             }, _this);
         });
     };
     Main.prototype.update = function (timeStamp) {
+        // console.log("tick:" + timeStamp);
         GameManager.getInstance().update(timeStamp);
         return false;
     };
@@ -182,23 +237,30 @@ var Main = (function (_super) {
      * Create scene interface
      */
     Main.prototype.createGameScene = function () {
-        this.gameGroup = new eui.Group();
-        this.gameGroup.width = this.width;
-        this.gameGroup.height = this.height;
-        this.addChild(this.gameGroup);
-        // 选关卡等等；
-        this.loginUI = new LoginUI();
-        this.addChild(this.loginUI);
-    };
-    /**
-     * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
-     * Create a Bitmap object according to name keyword.As for the property of name please refer to the configuration file of resources/resource.json.
-     */
-    Main.prototype.createBitmapByName = function (name) {
-        var result = new egret.Bitmap();
-        var texture = RES.getRes(name);
-        result.texture = texture;
-        return result;
+        return __awaiter(this, void 0, void 0, function () {
+            var bg, stageW, stageH;
+            return __generator(this, function (_a) {
+                bg = Utils.createBitmapByName("BG_COMMON");
+                bg.fillMode = egret.BitmapFillMode.SCALE;
+                this.addChild(bg);
+                stageW = this.stage.stageWidth;
+                stageH = this.stage.stageHeight;
+                bg.width = stageW;
+                bg.height = stageH;
+                this.gameGroupMask = new eui.Group();
+                this.gameGroupMask.width = this.width;
+                this.gameGroupMask.height = this.height;
+                this.gameGroupMask.touchThrough = true;
+                this.addChild(this.gameGroupMask);
+                this.gameGroup = new eui.Group();
+                this.gameGroup.width = this.width;
+                this.gameGroup.height = this.height;
+                this.addChild(this.gameGroup);
+                this.loginUI = new LoginUI();
+                this.addChild(this.loginUI);
+                return [2 /*return*/];
+            });
+        });
     };
     /**
      * 点击按钮

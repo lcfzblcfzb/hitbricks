@@ -26,6 +26,9 @@
 //  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //////////////////////////////////////////////////////////////////////////////////////
+// declare const Bmob: any;
+//游戏实际的宽高比
+const GAME_RATIO = 0.6;
 
 class Main extends eui.UILayer {
 
@@ -51,51 +54,115 @@ class Main extends eui.UILayer {
         egret.registerImplementation("eui.IAssetAdapter", assetAdapter);
         egret.registerImplementation("eui.IThemeAdapter", new ThemeAdapter());
 
+        this.addEventListener(egret.Event.RESIZE, (e) => {
+            console.log("in resize");
+
+            console.log("windowwidth:" + window.innerWidth);
+            console.log("windowheight:" + window.innerHeight);
+            console.log("stagewidth:" + this.stage.width);
+            console.log("stageheight:" + this.stage.height);
+        }, this);
         let self = this;
         this.runGame().catch(e => {
             console.log(e);
-        }).then(() => { return egret.startTick(self.update, self); })
+        }).then(() => {
+
+            return egret.startTick(self.update, self);
+        })
 
     }
 
     private async runGame() {
         await this.loadResource()
-        this.createGameScene();
+        await this.createGameScene();
         const result = await RES.getResAsync("description_json")
+
         await platform.login();
         const userInfo = await platform.getUserInfo();
-        //TODO 保存用户数据，取得关卡信息；
-        if (PlayerMng.getInstance().chap <=0) {
-            //初始化为第一关；
-            const setting = RES.getRes("game_json");
-            PlayerMng.getInstance().chap =setting.initChap;
-            PlayerMng.getInstance().index =setting.initIndex;
-        }
-        await  StageMng.getInstance().init();
-        GameManager.getInstance().init(this.gameGroup);
-
         console.log(userInfo);
+        
+        //TODO 保存用户数据，取得关卡信息；
+        const setting = await RES.getResAsync("myGame_json");
+        if (PlayerMng.getInstance().chap <= 0) {
+            //初始化为第一关；
+
+            GameManager.getInstance().init(this.gameGroup, setting);
+            PlayerMng.getInstance().chap = setting.initChap;
+            PlayerMng.getInstance().index = setting.initIndex;
+        }
+        const init = await StageMng.getInstance().init();
+        this.loginUI.updateStageIndex();
+
+        //游戏结束
+        this.addEventListener(GameProcessEvent.GAME_END, () => {
+            this.loginUI.visible = true;
+            this.gameGroup.mask = this.gameGroupMask;
+
+            PlayerMng.getInstance().chap = setting.initChap;
+            PlayerMng.getInstance().index = setting.initIndex;
+            this.loginUI.updateStageIndex();
+        }, this);
+
+        //游戏开始
+        this.addEventListener(GameProcessEvent.STAGE_START, () => {
+            this.loginUI.visible = false;
+            this.gameGroup.mask = null;
+
+        }, this);
+
+        //游戏暂停
+        this.addEventListener(GameProcessEvent.STAGE_PAUSED, () => {
+            this.loginUI.visible = true;
+            this.loginUI.updateStageIndex();
+            this.gameGroup.mask = this.gameGroupMask;
+        }, this);
+
+        //游戏暂停返回
+        this.addEventListener(GameProcessEvent.STAGE_RETURN, () => {
+            this.loginUI.visible = false;
+            this.gameGroup.mask = null;
+        }, this);
+
+        // const userInfo = await platform.getUserInfo();
+        // console.log(userInfo);
     }
 
     private async loadResource() {
         try {
             const loadingView = new LoadingUI();
             this.stage.addChild(loadingView);
+            // await RES.loadConfig("default.res.json", "http://139.155.27.151:8080/res/resource/").catch((err) => {
+            // });
+
             await RES.loadConfig("resource/default.res.json", "resource/");
-            await this.loadTheme();
             await RES.loadGroup("preload", 0, loadingView);
+            await this.loadTheme();
+
+            let pic = RES.getRes("MovieClips_png");
+            let json = RES.getRes("MovieClips_json");
+            const mcFactory: egret.MovieClipDataFactory = new egret.MovieClipDataFactory(json, pic);
+            this.stage['mcFactory'] = mcFactory;
             this.stage.removeChild(loadingView);
+
         }
         catch (e) {
             console.error(e);
         }
     }
-
     private loadTheme() {
         return new Promise((resolve, reject) => {
             // load skin theme configuration file, you can manually modify the file. And replace the default skin.
             //加载皮肤主题配置文件,可以手动修改这个文件。替换默认皮肤。
-            let theme = new eui.Theme("resource/default.thm.json", this.stage);
+            // let theme = new eui.Theme("resource/default.thm.json", this.stage);
+            // theme.addEventListener(eui.UIEvent.COMPLETE, () => {
+            //     resolve();
+            // }, this);
+
+            egret.ImageLoader.crossOrigin = "anonymous";//设置允许跨域加载
+
+            // load skin theme configuration file, you can manually modify the file. And replace the default skin.
+            //加载皮肤主题配置文件,可以手动修改这个文件。替换默认皮肤。
+            let theme = new eui.Theme("resource/default.thm.json", this.stage);//这里要填入服务器的ip地址
             theme.addEventListener(eui.UIEvent.COMPLETE, () => {
                 resolve();
             }, this);
@@ -105,6 +172,7 @@ class Main extends eui.UILayer {
 
     private update(timeStamp: number): boolean {
 
+        // console.log("tick:" + timeStamp);
         GameManager.getInstance().update(timeStamp);
 
         return false;
@@ -112,36 +180,88 @@ class Main extends eui.UILayer {
     }
 
     UIlayer = this;
+    //遮罩对象
+    gameGroupMask: eui.Group;
     //游戏group,每一局都会重置;
-    gameGroup:eui.Group;
+    gameGroup: eui.Group;
     //关卡选择UI;
-    loginUI:eui.Component;
+    loginUI: LoginUI;
+    //UI 布局group；
+    hudGroup: eui.Group;
+    //动画工厂
+    mcFactory: egret.MovieClipDataFactory;
 
     private textfield: egret.TextField;
     /**
      * 创建场景界面
      * Create scene interface
      */
-    protected createGameScene(): void {
-        
+    protected async createGameScene() {
+
+        let bg = Utils.createBitmapByName("BG_COMMON");
+        bg.fillMode = egret.BitmapFillMode.SCALE;
+        this.addChild(bg);
+        let stageW = this.stage.stageWidth;
+        let stageH = this.stage.stageHeight;
+        bg.width = stageW;
+        bg.height = stageH;
+
+        this.gameGroupMask = new eui.Group();
+        this.gameGroupMask.width = this.width;
+        this.gameGroupMask.height = this.height;
+        this.gameGroupMask.touchThrough = true;
+        this.addChild(this.gameGroupMask);
+
         this.gameGroup = new eui.Group();
         this.gameGroup.width = this.width;
         this.gameGroup.height = this.height;
         this.addChild(this.gameGroup);
-        // 选关卡等等；
+
         this.loginUI = new LoginUI();
         this.addChild(this.loginUI);
+
+        // var imgLoader: egret.ImageLoader = new egret.ImageLoader();
+        // imgLoader.once(egret.Event.COMPLETE, (evt: egret.Event) => {
+        //     let loader: egret.ImageLoader = evt.currentTarget;
+        //     let bmd: egret.BitmapData = loader.data;
+        //     //创建纹理对象
+        //     let texture = new egret.Texture();
+        //     texture.bitmapData = bmd;
+        //     let bmp: egret.Bitmap = new egret.Bitmap(texture);
+        //     bmp.width=100;
+        //     bmp.height=100;
+        //     this.addChild(bmp);
+        // }, this);
+        // imgLoader.crossOrigin = 'anonymous';
+        // imgLoader.load("http://43.226.144.135:8080/file/preview.jpg");
+        // var request = new egret.HttpRequest();
+        // request.responseType = egret.HttpResponseType.TEXT;
+        // request.open("http://139.155.27.151:8080/res/preview.jpg", egret.HttpMethod.GET);
+        // request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        // request.responseType = "blob";
+        // request.send();
+        // request.addEventListener(egret.Event.COMPLETE, (event: egret.Event) => {
+        //     var request = <egret.HttpRequest>event.currentTarget;
+        //     console.log("post data : ", request.response);
+        //     var image = new Image();
+        //     image.src = window["URL"].createObjectURL(request.response);
+        //     image.onload = (res) => {
+        //         //创建纹理对象
+        //         let texture = new egret.Texture();
+        //         texture.bitmapData = new egret.BitmapData(image);
+        //         let bmp: egret.Bitmap = new egret.Bitmap(texture);
+        //         this.addChild(bmp);
+        //     }
+        // }, this);
+        // request.addEventListener(egret.IOErrorEvent.IO_ERROR, (e) => {
+        // }, this);
+        // request.addEventListener(egret.ProgressEvent.PROGRESS, (e) => {
+        // }, this);
+
+
+
     }
-    /**
-     * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
-     * Create a Bitmap object according to name keyword.As for the property of name please refer to the configuration file of resources/resource.json.
-     */
-    private createBitmapByName(name: string): egret.Bitmap {
-        let result = new egret.Bitmap();
-        let texture: egret.Texture = RES.getRes(name);
-        result.texture = texture;
-        return result;
-    }
+
 
 
     /**
@@ -156,3 +276,4 @@ class Main extends eui.UILayer {
         this.addChild(panel);
     }
 }
+

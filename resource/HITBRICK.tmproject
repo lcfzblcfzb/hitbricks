@@ -1,0 +1,18 @@
+{
+    "projectName": "HITBRICK",
+    "files": [
+        "./../../../../C:/Users/37073/Documents/Aesprite/ball.png",
+        "./../../../../C:/Users/37073/Documents/Aesprite/BG_COMMON_SKY.png",
+        "./../../../../C:/Users/37073/Documents/Aesprite/BRICK_PEOPLE.png",
+        "./../../../../C:/Users/37073/Documents/Aesprite/BRICK_GIRL.png",
+        "./../../../../C:/Users/37073/Documents/Aesprite/BRICK_TSHIRT.png"
+    ],
+    "options": {
+        "sizeMode": "2n",
+        "useExtension": 0,
+        "layoutGap": 1,
+        "extend": 0,
+        "layoutMath": "3"
+    },
+    "version": 5
+}

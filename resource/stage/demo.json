@@ -1,17 +1,38 @@
 {
-
-    "configurables":[
+    "configurables": [
         {
-            "x":320,
-            "y":0,
-            "width":10,
-            "height":10,
-            "color":"0x000079",
-            "type":100
+            "x": 0,
+            "y": 0,
+            "width": 10,
+            "height": 10,
+            "color": "0x000079",
+            "type": 100
+        },
+        {
+            "x": 0,
+            "y": 100,
+            "width": 10,
+            "height": 10,
+            "color": "0x000079",
+            "type": 100
+        },
+        {
+            "x": 100,
+            "y": 100,
+            "width": 10,
+            "height": 10,
+            "color": "0x000079",
+            "type": 100
+        },
+        {
+            "x": 100,
+            "y": 0,
+            "width": 10,
+            "height": 10,
+            "color": "0x000079",
+            "type": 100
         }
-
     ],
-    "chap":1,
-    "index":1
-
+    "chap": 1,
+    "index": 2
 }

@@ -7,6 +7,8 @@ interface IMovable {
     speedY: number;
     canMove: boolean;
     update(context: any): void;
-    revertXSpeed(): void;
-    revertYSpeed(): void;
+    resetXSpeed(direction:boolean): void;
+    resetYSpeed(direction:boolean): void;
+
+    collitionTag:number;
 }   

@@ -16,6 +16,7 @@ var RebounceObj = (function (_super) {
         return _this;
     }
     RebounceObj.prototype.onHit = function (target) {
+        var startTime = new Date().getTime();
         //需要传入全局对象得到相对全局坐标的矩形；
         var inflateRec = this.getTransformedBounds(GameManager.getInstance().stage).clone();
         inflateRec.inflate(target.width / 2, target.height / 2); //计算出碰撞外壳矩形;
@@ -24,13 +25,39 @@ var RebounceObj = (function (_super) {
         if (intersectPoints.length > 0) {
             var firstP = this.calcFirstIntersecPoint(intersectPoints, target);
             if (firstP != null) {
+                if (true) {
+                    // console.log("stagewidth:" + this.stage.width);
+                    // console.log("stageheight:" + this.stage.height);
+                    // #FFD700
+                    // let hitRec = new egret.Shape();
+                    // hitRec.x = firstP.x;
+                    // hitRec.y = firstP.y;
+                    // hitRec.graphics.lineStyle(0, 0xFFD700);
+                    // hitRec.graphics.beginFill(0xFFD700, 2);
+                    // hitRec.graphics.drawCircle(0, 0, 2);
+                    // hitRec.graphics.endFill();
+                    // this.stage.addChild(hitRec);
+                    var label = new egret.TextField();
+                    label.text = (RebounceObj.count++).toString();
+                    label.x = firstP.x;
+                    label.y = firstP.y;
+                    label.width = 32;
+                    label.height = 32;
+                    label.size = 15;
+                    this.stage.addChild(label);
+                }
                 if (firstP.x == inflateRec.left || firstP.x == inflateRec.right) {
-                    target.revertXSpeed();
+                    if (true)
+                        console.log("resettingXSpeed" + (firstP.x == inflateRec.right));
+                    target.resetXSpeed(firstP.x == inflateRec.right);
                 }
                 else if (firstP.y == inflateRec.top || firstP.y == inflateRec.bottom) {
-                    target.revertYSpeed();
+                    if (true)
+                        console.log("resettingYSpeed" + (firstP.y == inflateRec.bottom));
+                    target.resetYSpeed(firstP.y == inflateRec.bottom);
                 }
                 if (this.deleteOnHit) {
+                    this.onDelete();
                     var thisIndex = GameManager.getInstance().entityMap[this.getName()].indexOf(this);
                     if (thisIndex >= 0) {
                         GameManager.getInstance().entityMap[this.getName()].splice(thisIndex, 1);
@@ -40,7 +67,11 @@ var RebounceObj = (function (_super) {
                 }
             }
         }
+        if (true)
+            console.log("onHit Cost:" + (new Date().getTime() - startTime) + "ms");
     };
+    RebounceObj.prototype.onDelete = function () { };
+    ;
     //计算直线与矩形的交点
     RebounceObj.prototype.calcPoints = function (rec, target) {
         var result = [];
@@ -49,11 +80,12 @@ var RebounceObj = (function (_super) {
         var bottom = rec.bottom;
         var right = rec.right;
         var top = rec.top;
+        //如果不是垂直
         if (target.speedX != 0) {
+            //如果平行的情况，speedY是等于0，k 也等于0
             var k = target.speedY / target.speedX;
             var b = target.y - target.x * k;
             //先计算函数交点（即矩形的4条边当作直线处理）
-            //需要特殊处理 垂直的情况
             if (k != Number.POSITIVE_INFINITY && k != Number.NEGATIVE_INFINITY) {
                 var leftPoint = new egret.Point(left, k * left + b);
                 var rightPoint = new egret.Point(right, k * right + b);
@@ -85,6 +117,7 @@ var RebounceObj = (function (_super) {
             result.push(topPoint);
             result.push(bottomPoint);
         }
+        //只是把矩形的四周代入进行运算，最后过滤出 矩形上的点
         for (var _i = 0, result_1 = result; _i < result_1.length; _i++) {
             var p = result_1[_i];
             if (!(p.x < left || p.x > right || p.y < top || p.y > bottom)) {
@@ -99,39 +132,54 @@ var RebounceObj = (function (_super) {
             return null;
         var p1 = points[0];
         var p2 = points[1];
-        var kBall = Number.POSITIVE_INFINITY;
-        if (target.speedX != 0) {
-            kBall = target.speedY / target.speedX;
-        }
-        var k = Number.POSITIVE_INFINITY;
-        if (p2.x != p1.x) {
-            k = (p2.y - p1.y) / (p2.x - p1.x);
-        }
-        if (kBall == Number.POSITIVE_INFINITY && k == Number.POSITIVE_INFINITY) {
-            return p2.y > p1.y ? p2 : p1;
-        }
-        else if (kBall == Number.POSITIVE_INFINITY || k == Number.POSITIVE_INFINITY) {
-            return null;
+        if (target.speedX != 0 || target.speedY != 0) {
+            if (target.speedY > 0) {
+                return p1.y > p2.y ? p2 : p1;
+            }
+            else if (target.speedY < 0) {
+                return p1.y > p2.y ? p1 : p2;
+            }
+            else if (target.speedX > 0) {
+                return p1.x > p2.x ? p2 : p1;
+            }
+            else if (target.speedX < 0) {
+                return p1.x > p2.x ? p1 : p2;
+            }
         }
         else {
-            if (kBall * k > 0) {
-                //如果是在内部（可能出现），判断下坐标
-                if (target.x > p1.x) {
-                    return p2;
-                }
-                return p1; //斜率方向相同，p1->p2;
-            }
-            else if (kBall * k < 0) {
-                if (target.x < p2.x) {
-                    return p1;
-                }
-                return p2; //方向相反，p2->p1;
-            }
-            else {
-                return null;
-            }
+            console.log("ball speedX and speedY =0");
+            return null;
         }
+        // let kBall = Number.POSITIVE_INFINITY;
+        // 		if (target.speedX != 0) {
+        // 			kBall = target.speedY / target.speedX;
+        // 		}
+        // 		let k = Number.POSITIVE_INFINITY;
+        // 		if (p2.x != p1.x) {
+        // 			k = (p2.y - p1.y) / (p2.x - p1.x);
+        // 		}
+        // if (kBall == Number.POSITIVE_INFINITY && k == Number.POSITIVE_INFINITY) {
+        // 	return p2.y > p1.y ? p2 : p1;
+        // } else if (kBall == Number.POSITIVE_INFINITY || k == Number.POSITIVE_INFINITY) {
+        // 	return null;
+        // } else {
+        // 	if (kBall * k > 0) {
+        // 		//如果是在内部（可能出现），判断下坐标
+        // 		if (target.x > p1.x) {
+        // 			return p2;
+        // 		}
+        // 		return p1;//斜率方向相同，p1->p2;
+        // 	} else if (kBall * k < 0) {
+        // 		if (target.x < p2.x) {
+        // 			return p1;
+        // 		}
+        // 		return p2;//方向相反，p2->p1;
+        // 	} else {
+        // 		return null;
+        // 	}
+        // }
     };
+    RebounceObj.count = 0;
     return RebounceObj;
 }(egret.Sprite));
 __reflect(RebounceObj.prototype, "RebounceObj", ["IFlexible", "IConfigurable"]);
