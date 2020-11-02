@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="LoginUISkin" width="400" height="300" xmlns:e="http://ns.egret.com/eui"
+        xmlns:w="http://ns.egret.com/wing" xmlns:tween="egret.tween.*" >
+	<w:Declarations>
+	</w:Declarations>
+	<w:Config id="174fb941418"></w:Config>
+	<e:Group id="backGroup" left="0" right="0" top="0" bottom="0" scaleX="1" scaleY="1"  />
+	<e:Label text="" left="0" right="0" top="0" bottom="0" backgroundColor="0xdbb14d" background="true" borderColor="0xdbb14d" blendMode="erase" alpha="0"/>
+	<e:Group id="uiGroup" width="400" height="300" x="0" y="0" anchorOffsetX="0" anchorOffsetY="0" scaleX="1" scaleY="1">
+		<e:Group id="startGroup" width="82" height="67" x="159" y="150" anchorOffsetX="0" anchorOffsetY="0" name="startGroup"/>
+		<e:Label id="stageNum" text="1-1" anchorOffsetX="0" width="173" anchorOffsetY="0" height="66" horizontalCenter="0.5" top="47"
+		         textAlign="center" x="174" y="-259" scaleX="1" scaleY="1"  strokeColor="0x000000" stroke="1" textColor="0x000000" size="66"/>
+	</e:Group>
+</e:Skin>

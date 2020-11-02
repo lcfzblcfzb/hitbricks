@@ -1,0 +1,11 @@
+{
+    "initChap": 1,
+    "initIndex": 1,
+    "ballRadius":12,
+    "ballColor":"0x97FFFF",
+    "ballInitSpeedY":-12,
+    "ballInitSpeedX":1,
+    "batWidth":100,
+    "batHeight":10,
+    "batColor":"0x000079"
+}
