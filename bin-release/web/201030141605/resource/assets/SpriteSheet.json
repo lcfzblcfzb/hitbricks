@@ -1,0 +1,11 @@
+{"file":"SpriteSheet.png","frames":{
+"FAIL_SCENE":{"x":771,"y":132,"w":128,"h":129,"offX":0,"offY":0,"sourceW":128,"sourceH":129},
+"WIN_SCENE":{"x":771,"y":1,"w":128,"h":129,"offX":0,"offY":0,"sourceW":128,"sourceH":129},
+"SAD_SCENE":{"x":771,"y":263,"w":128,"h":128,"offX":0,"offY":0,"sourceW":128,"sourceH":128},
+"BRICK_TSHIRT":{"x":990,"y":1,"w":25,"h":21,"offX":4,"offY":5,"sourceW":32,"sourceH":32},
+"BRICK_GIRL":{"x":990,"y":24,"w":25,"h":21,"offX":4,"offY":5,"sourceW":32,"sourceH":32},
+"BRICK_PEOPLE":{"x":963,"y":1,"w":25,"h":23,"offX":4,"offY":5,"sourceW":32,"sourceH":32},
+"BG_COMMON_SKY":{"x":1,"y":1,"w":768,"h":1366,"offX":0,"offY":0,"sourceW":768,"sourceH":1366},
+"ball":{"x":963,"y":26,"w":15,"h":15,"offX":9,"offY":9,"sourceW":32,"sourceH":32},
+"RESUME_BTN":{"x":935,"y":1,"w":26,"h":28,"offX":3,"offY":2,"sourceW":32,"sourceH":32},
+"PAUSE_BTN":{"x":901,"y":1,"w":32,"h":32,"offX":0,"offY":0,"sourceW":32,"sourceH":32}}}

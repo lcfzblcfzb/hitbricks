@@ -1,6 +1,22 @@
 {
     "configurations": [
         {
+<<<<<<< HEAD
+=======
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\libs\\modules\\eui\\eui.d.ts",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": [
+                "${workspaceFolder}/bin-debug/**/*.js"
+            ]
+        },
+        {
+>>>>>>> temp
             "type": "Egret",
             "request": "launch",
             "name": "Egret WebpackDevServer Debugger",
@@ -9,5 +25,11 @@
             "preLaunchTask": "egret: build"
         }
     ],
+<<<<<<< HEAD
+=======
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+>>>>>>> temp
     "version": "0.2.0"
 }

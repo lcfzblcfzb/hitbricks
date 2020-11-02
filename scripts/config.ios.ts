@@ -4,8 +4,11 @@
 import * as path from 'path';
 import { UglifyPlugin, CompilePlugin, ManifestPlugin, ExmlPlugin, EmitResConfigFilePlugin, TextureMergerPlugin, CleanPlugin } from 'built-in';
 import * as defaultConfig from './config';
+<<<<<<< HEAD
 import { EuiCompilerPlugin } from './plugins/eui-compiler-plugin';
 import { WebpackBundlePlugin } from './plugins/webpack-plugin';
+=======
+>>>>>>> temp
 
 const config: ResourceManagerConfig = {
 
@@ -17,6 +20,7 @@ const config: ResourceManagerConfig = {
                 outputDir,
                 commands: [
                     new CleanPlugin({ matchers: ["js", "resource"] }),
+<<<<<<< HEAD
                     // new CompilePlugin({ libraryType: "debug", defines: { DEBUG: true, RELEASE: false } }),
                     new WebpackBundlePlugin({ //新的 Webpack 编译器
                         libraryType: "debug",
@@ -28,6 +32,10 @@ const config: ResourceManagerConfig = {
                     }),
                     new ExmlPlugin('commonjs'), // 非 EUI 项目关闭此设置
                     // new EuiCompilerPlugin(),//新的 eui 编译器
+=======
+                    new CompilePlugin({ libraryType: "debug", defines: { DEBUG: true, RELEASE: false } }),
+                    new ExmlPlugin('commonjs'), // 非 EUI 项目关闭此设置
+>>>>>>> temp
                     new ManifestPlugin({ output: 'manifest.json' })
                 ]
             }
@@ -37,6 +45,7 @@ const config: ResourceManagerConfig = {
                 outputDir,
                 commands: [
                     new CleanPlugin({ matchers: ["js", "resource"] }),
+<<<<<<< HEAD
                     // new CompilePlugin({ libraryType: "release", defines: { DEBUG: false, RELEASE: true } }),
                     new WebpackBundlePlugin({ //新的 Webpack 编译器
                         libraryType: "release",
@@ -48,6 +57,10 @@ const config: ResourceManagerConfig = {
                     }),
                     new ExmlPlugin('commonjs'), // 非 EUI 项目关闭此设置
                     // new EuiCompilerPlugin(),//新的 eui 编译器
+=======
+                    new CompilePlugin({ libraryType: "release", defines: { DEBUG: false, RELEASE: true } }),
+                    new ExmlPlugin('commonjs'), // 非 EUI 项目关闭此设置
+>>>>>>> temp
                     new UglifyPlugin([{
                         sources: ["main.js"],
                         target: "main.min.js"

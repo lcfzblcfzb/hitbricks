@@ -59,3 +59,7 @@ __reflect(DebugPlatform.prototype, "DebugPlatform", ["Platform"]);
 if (!window.platform) {
     window.platform = new DebugPlatform();
 }
+<<<<<<< HEAD
+=======
+//# sourceMappingURL=Platform.js.map
+>>>>>>> temp

@@ -59,3 +59,7 @@ var AssetAdapter = (function () {
     return AssetAdapter;
 }());
 __reflect(AssetAdapter.prototype, "AssetAdapter", ["eui.IAssetAdapter"]);
+<<<<<<< HEAD
+=======
+//# sourceMappingURL=AssetAdapter.js.map
+>>>>>>> temp

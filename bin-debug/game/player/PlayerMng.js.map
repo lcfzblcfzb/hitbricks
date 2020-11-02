@@ -1,0 +1,1 @@
+{"version":3,"file":"PlayerMng.js","sourceRoot":"","sources":["../../../src/game/player/PlayerMng.ts"],"names":[],"mappings":";;;AAAA;IACC;QAUA,QAAQ;QACR,SAAI,GAAQ,CAAC,CAAC,CAAC;QACf,UAAK,GAAQ,CAAC,CAAC,CAAC;IAXhB,CAAC;IAIa,qBAAW,GAAzB;QACC,MAAM,CAAC,SAAS,CAAC,SAAS,CAAC;IAC5B,CAAC;IAJM,mBAAS,GAAG,IAAI,SAAS,EAAE,CAAC;IAWpC,gBAAC;CAAA,AAfD,IAeC;AAfK,UAAA,SAAS,wBAed,CAAA"}

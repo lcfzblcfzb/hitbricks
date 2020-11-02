@@ -3,9 +3,15 @@
 
 import * as path from 'path';
 import { UglifyPlugin, IncrementCompilePlugin, CompilePlugin, ManifestPlugin, ExmlPlugin, EmitResConfigFilePlugin, TextureMergerPlugin, RenamePlugin } from 'built-in';
+<<<<<<< HEAD
 import { CustomPlugin } from './myplugin';
 import { EuiCompilerPlugin } from './plugins/eui-compiler-plugin';
 import { WebpackDevServerPlugin, WebpackBundlePlugin } from './plugins/webpack-plugin';
+=======
+import { WxgamePlugin } from './wxgame/wxgame';
+import { BricksPlugin } from './bricks/bricks';
+import { CustomPlugin } from './myplugin';
+>>>>>>> temp
 
 const config: ResourceManagerConfig = {
 
@@ -26,6 +32,7 @@ const config: ResourceManagerConfig = {
                     //     groupSelector: p => "preload"
                     // }),
                     new ExmlPlugin('debug'), // 非 EUI 项目关闭此设置
+<<<<<<< HEAD
                     // new EuiCompilerPlugin(),//新的 eui 编译器
                     // new IncrementCompilePlugin(),
                     new WebpackDevServerPlugin({ //新的 Webpack 编译器
@@ -44,6 +51,9 @@ const config: ResourceManagerConfig = {
                     //     open: false,
                     //     port: 3000
                     // }),
+=======
+                    new IncrementCompilePlugin(),
+>>>>>>> temp
                 ]
             }
         }
@@ -53,6 +63,7 @@ const config: ResourceManagerConfig = {
                 outputDir,
                 commands: [
                     new CustomPlugin(),
+<<<<<<< HEAD
                     // new CompilePlugin({ libraryType: "release", defines: { DEBUG: false, RELEASE: true } }),
                     new WebpackBundlePlugin({ //新的 Webpack 编译器
                         libraryType: "release",
@@ -64,6 +75,10 @@ const config: ResourceManagerConfig = {
                     }),
                     new ExmlPlugin('commonjs'), // 非 EUI 项目关闭此设置
                     // new EuiCompilerPlugin(),//新的 eui 编译器
+=======
+                    new CompilePlugin({ libraryType: "release", defines: { DEBUG: false, RELEASE: true } }),
+                    new ExmlPlugin('commonjs'), // 非 EUI 项目关闭此设置
+>>>>>>> temp
                     new UglifyPlugin([{
                         sources: ["main.js"],
                         target: "main.min.js"
