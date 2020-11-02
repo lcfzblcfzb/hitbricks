@@ -29,14 +29,14 @@ var RebounceObj = (function (_super) {
                     // console.log("stagewidth:" + this.stage.width);
                     // console.log("stageheight:" + this.stage.height);
                     // #FFD700
-                    // let hitRec = new egret.Shape();
-                    // hitRec.x = firstP.x;
-                    // hitRec.y = firstP.y;
-                    // hitRec.graphics.lineStyle(0, 0xFFD700);
-                    // hitRec.graphics.beginFill(0xFFD700, 2);
-                    // hitRec.graphics.drawCircle(0, 0, 2);
-                    // hitRec.graphics.endFill();
-                    // this.stage.addChild(hitRec);
+                    var hitRec = new egret.Shape();
+                    hitRec.x = firstP.x;
+                    hitRec.y = firstP.y;
+                    hitRec.graphics.lineStyle(0, 0xFFD700);
+                    hitRec.graphics.beginFill(0xFFD700, 2);
+                    hitRec.graphics.drawCircle(0, 0, 2);
+                    hitRec.graphics.endFill();
+                    this.stage.addChild(hitRec);
                     var label = new egret.TextField();
                     label.text = (RebounceObj.count++).toString();
                     label.x = firstP.x;

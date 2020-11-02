@@ -32,6 +32,11 @@ const GAME_RATIO = 0.6;
 
 class Main extends eui.UILayer {
 
+    static instance: Main;
+    //获取单例；
+    static getInstance(): Main {
+        return Main.instance;
+    }
 
     protected createChildren(): void {
         super.createChildren();
@@ -46,6 +51,10 @@ class Main extends eui.UILayer {
 
         egret.lifecycle.onResume = () => {
             egret.ticker.resume();
+        }
+
+        if (Main.instance == null) {
+            Main.instance = this;
         }
 
         //inject the custom material parser
@@ -74,13 +83,32 @@ class Main extends eui.UILayer {
 
     private async runGame() {
         await this.loadResource()
-        await this.createGameScene();
         const result = await RES.getResAsync("description_json")
 
-        await platform.login();
-        const userInfo = await platform.getUserInfo();
+        this._createBG();
+
+        let loginWechatBtn: eui.Label = new eui.Label();
+        loginWechatBtn.x = 0.5 * this.stage.stageWidth;
+        loginWechatBtn.y = 0.2 * this.stage.stageHeight;
+        loginWechatBtn.width = 128;
+        loginWechatBtn.height = 128;
+        loginWechatBtn.text = "用户授权";
+        loginWechatBtn.verticalAlign = egret.VerticalAlign.MIDDLE;
+        loginWechatBtn.textColor = 0x29179c;
+        loginWechatBtn.stroke = 2;
+        loginWechatBtn.strokeColor = 0x5748bd;
+        loginWechatBtn.background = true;
+        loginWechatBtn.backgroundColor = 0xafbd4a;
+        loginWechatBtn.alpha = 0.8;
+        this.addChild(loginWechatBtn);
+
+        let loginResult = await platform.login();
+        const userInfo = await platform.getUserInfo((loginWechatBtn.x - 64) / this.stage.stageWidth, 0.2, 128 / this.stage.stageWidth, 128 / this.stage.stageHeight);
         console.log(userInfo);
-        
+
+        this.removeChild(loginWechatBtn);
+
+        await this.createGameScene();
         //TODO 保存用户数据，取得关卡信息；
         const setting = await RES.getResAsync("myGame_json");
         if (PlayerMng.getInstance().chap <= 0) {
@@ -94,47 +122,171 @@ class Main extends eui.UILayer {
         this.loginUI.updateStageIndex();
 
         //游戏结束
-        this.addEventListener(GameProcessEvent.GAME_END, () => {
-            this.loginUI.visible = true;
-            this.gameGroup.mask = this.gameGroupMask;
+        this.addEventListener(GameProcessEvent.GAME_END, (e: GameProcessEvent) => {
 
             PlayerMng.getInstance().chap = setting.initChap;
             PlayerMng.getInstance().index = setting.initIndex;
             this.loginUI.updateStageIndex();
+            //设置暂停按钮为不可见
+            this.pauseBtn.visible = false;
+
+            if (e.data) {
+
+                //玩家胜利 播放胜利图片
+
+                var label: egret.TextField = new egret.TextField();
+                label.text = "YOU WIN,NOW HAPPY?";
+                label.textColor = 0xff002f;
+                label.size = 60;
+                label.verticalAlign = egret.VerticalAlign.MIDDLE;
+                label.alpha = 0;
+                this.addChild(label);
+
+                label.height = 500;
+                label.width = 300;
+
+                label.anchorOffsetX = label.width / 2;
+                label.anchorOffsetY = label.height / 2;
+                label.wordWrap = true;
+                label.multiline = true;
+                label.type = egret.TextFieldType.INPUT;
+                label.x = this.stage.stageWidth / 2;
+                label.y = this.stage.stageHeight / 3;
+                var tween = egret.Tween.get(label).to({ alpha: 1 }, 1000, egret.Ease.circIn).wait(700).call(() => {
+                    //玩家失败 播放失败图片
+                    var img: egret.Bitmap = new egret.Bitmap();
+                    img.texture = RES.getRes("SAD_SCENE");
+                    img.anchorOffsetX = img.width / 2;
+                    img.anchorOffsetY = img.height / 2;
+                    img.x = this.stage.stageWidth / 2;
+                    img.y = this.stage.stageHeight / 2;
+                    img.fillMode = egret.BitmapFillMode.SCALE;
+                    this.addChild(img);
+
+                    let listener = (e) => {
+                        this.removeChild(label);
+                        this.removeChild(img);
+
+                        this.loginUI.visible = true;
+                        this.gameGroupMask.visible = true;
+                        this.removeEventListener("touchTap", listener, this);
+                    };
+                    this.addEventListener('touchTap', listener, this);
+                });
+
+                //游戏内容变成透明
+                egret.Tween.get(this.gameGroup).to({ alpha: 0 }, 1000);
+
+            } else {
+                //玩家失败 播放失败动画
+                var label: egret.TextField = new egret.TextField();
+                label.text = "YOU DIE";
+                label.textColor = 0xff002f;
+                label.size = 60;
+                label.verticalAlign = egret.VerticalAlign.MIDDLE;
+                label.alpha = 0;
+                label.anchorOffsetX = label.width / 2;
+                label.anchorOffsetY = label.height / 2;
+                this.addChild(label);
+                label.x = this.stage.stageWidth / 2;
+                label.y = this.stage.stageHeight / 3;
+                var tween = egret.Tween.get(label).to({ alpha: 1 }, 1500, egret.Ease.circIn).wait(700).call(() => {
+                    //玩家失败 播放失败图片
+                    var img: egret.Bitmap = new egret.Bitmap();
+                    img.texture = RES.getRes("FAIL_SCENE");
+                    img.anchorOffsetX = img.width / 2;
+                    img.anchorOffsetY = img.height / 2;
+                    img.x = this.stage.stageWidth / 2;
+                    img.y = this.stage.stageHeight / 2;
+                    img.fillMode = egret.BitmapFillMode.SCALE;
+                    this.addChild(img);
+
+                    let listener = (e) => {
+                        //重新设置为可见
+
+                        this.removeChild(label);
+                        this.removeChild(img);
+                        //显示UI 操作
+                        this.loginUI.visible = true;
+                        this.gameGroupMask.visible = true;
+                        this.removeEventListener("touchTap", listener, this);
+                    };
+                    this.addEventListener('touchTap', listener, this);
+                });
+
+                egret.Tween.get(this.gameGroup).to({ alpha: 0 }, 1000);
+
+            }
+        }, this);
+
+        //游戏结束
+        this.addEventListener(GameProcessEvent.STAGE_END, (e: GameProcessEvent) => {
+
+
+            if (e.data && !StageMng.getInstance().isLastStage()) {
+                //暂停按钮隐藏
+                this.pauseBtn.visible = false;
+                //玩家小关胜利 播放胜利图片
+                var img: egret.Bitmap = new egret.Bitmap();
+                img.texture = RES.getRes("WIN_SCENE");
+                img.fillMode = egret.BitmapFillMode.SCALE;
+                img.anchorOffsetX = img.width / 2;
+                img.anchorOffsetY = img.height / 2;
+                img.x = this.stage.stageWidth / 2;
+                img.y = this.stage.stageHeight / 2;
+
+                this.addChild(img);
+
+                let listener = (e) => {
+                    this.removeChild(img);
+                    this.removeEventListener("touchEnd", listener, this);
+                    //下一关
+                    let nextStage: any = StageMng.getInstance().getNextStage();
+                    GameManager.getInstance().initStage(nextStage);
+                    PlayerMng.getInstance().chap = parseInt(nextStage.chap);
+                    PlayerMng.getInstance().index = parseInt(nextStage.index);
+                };
+                this.addEventListener('touchEnd', listener, this);
+
+                egret.Tween.get(this.gameGroup).to({ alpha: 0 }, 1000);
+            }
+
         }, this);
 
         //游戏开始
         this.addEventListener(GameProcessEvent.STAGE_START, () => {
             this.loginUI.visible = false;
-            this.gameGroup.mask = null;
+            this.gameGroupMask.visible = false;
+            this.pauseBtn.visible = true;
 
+            egret.Tween.get(this.gameGroup).to({ alpha: 1 }, 1000);
         }, this);
 
         //游戏暂停
         this.addEventListener(GameProcessEvent.STAGE_PAUSED, () => {
-            this.loginUI.visible = true;
-            this.loginUI.updateStageIndex();
-            this.gameGroup.mask = this.gameGroupMask;
+            // this.gameGroupMask.visible = true;
         }, this);
 
         //游戏暂停返回
         this.addEventListener(GameProcessEvent.STAGE_RETURN, () => {
             this.loginUI.visible = false;
-            this.gameGroup.mask = null;
+            this.gameGroupMask.visible = false;
         }, this);
 
-        // const userInfo = await platform.getUserInfo();
-        // console.log(userInfo);
+        this.dispatchEvent(GameProcessEvent.newInstance('GAME_START'));
     }
 
     private async loadResource() {
         try {
             const loadingView = new LoadingUI();
             this.stage.addChild(loadingView);
-            // await RES.loadConfig("default.res.json", "http://139.155.27.151:8080/res/resource/").catch((err) => {
-            // });
+            await RES.loadConfig("default.res.json", "https://www.lcfme.fun:8080/res/resource/").catch((err) => {
+                console.log("err loading res");
+                console.log(err);
 
-            await RES.loadConfig("resource/default.res.json", "resource/");
+            });
+            // await RES.loadConfig("resource/default.res.json", "resource/");
+            //
             await RES.loadGroup("preload", 0, loadingView);
             await this.loadTheme();
 
@@ -148,7 +300,7 @@ class Main extends eui.UILayer {
         catch (e) {
             console.error(e);
         }
-    }
+    }d
     private loadTheme() {
         return new Promise((resolve, reject) => {
             // load skin theme configuration file, you can manually modify the file. And replace the default skin.
@@ -171,10 +323,10 @@ class Main extends eui.UILayer {
     }
 
     private update(timeStamp: number): boolean {
-
-        // console.log("tick:" + timeStamp);
-        GameManager.getInstance().update(timeStamp);
-
+        if (!this.pause) {
+            // console.log("tick:" + timeStamp);
+            GameManager.getInstance().update(timeStamp);
+        }
         return false;
 
     }
@@ -190,35 +342,91 @@ class Main extends eui.UILayer {
     hudGroup: eui.Group;
     //动画工厂
     mcFactory: egret.MovieClipDataFactory;
+    //暂停按钮
+    pauseBtn: egret.Bitmap;
+
+    pause: boolean = false;
 
     private textfield: egret.TextField;
+
+    //创建背景图
+    private _createBG() {
+        let bg = Utils.createBitmapByName("BG_COMMON");
+        bg.fillMode = egret.BitmapFillMode.SCALE;
+        this.addChild(bg);
+        bg.width = this.stage.stageWidth;
+        bg.height = this.stage.stageHeight;
+    }
+
     /**
      * 创建场景界面
      * Create scene interface
      */
     protected async createGameScene() {
 
-        let bg = Utils.createBitmapByName("BG_COMMON");
-        bg.fillMode = egret.BitmapFillMode.SCALE;
-        this.addChild(bg);
         let stageW = this.stage.stageWidth;
         let stageH = this.stage.stageHeight;
-        bg.width = stageW;
-        bg.height = stageH;
-
-        this.gameGroupMask = new eui.Group();
-        this.gameGroupMask.width = this.width;
-        this.gameGroupMask.height = this.height;
-        this.gameGroupMask.touchThrough = true;
-        this.addChild(this.gameGroupMask);
 
         this.gameGroup = new eui.Group();
         this.gameGroup.width = this.width;
         this.gameGroup.height = this.height;
         this.addChild(this.gameGroup);
 
+        this.gameGroupMask = new eui.Group();
+        this.gameGroupMask.alpha = 0;
+        let shp = new egret.Shape();
+        shp.width = this.stage.stageWidth;
+        shp.height = this.stage.stageHeight;
+        shp.graphics.beginFill(0xff0000, 0.2);
+        shp.graphics.drawRect(0, 0, this.stage.stageWidth, this.stage.stageHeight);
+        shp.graphics.endFill();
+        this.gameGroupMask.touchChildren = false;
+        this.gameGroupMask.touchThrough = false;
+        this.gameGroupMask.addChild(shp);
+        this.addChild(this.gameGroupMask);
+
         this.loginUI = new LoginUI();
         this.addChild(this.loginUI);
+        //暂停按钮
+        this.pauseBtn = new egret.Bitmap();
+
+        this.pauseBtn.visible = false;
+        this.pauseBtn.texture = RES.getRes("PAUSE_BTN");
+        this.pauseBtn.width = 32;
+        this.pauseBtn.height = 32;
+        this.addChild(this.pauseBtn);
+        this.pauseBtn.x = stageW - this.pauseBtn.width - 5;
+        this.pauseBtn.y = 5;
+        this.pauseBtn.touchEnabled = true;
+
+        //从暂停中返回的操作,可以被按钮或者点击界面触发
+        let _resunmeFunc = () => {
+
+            egret.Tween.get(this.gameGroupMask).to({ alpha: 0 }, 600).call(() => {
+                this.gameGroupMask.visible = false;
+                this.pause = false;
+            });
+
+            this.pauseBtn.texture = RES.getRes("PAUSE_BTN");
+            if (this.gameGroupMask.hasEventListener("touchEnd"))
+                this.gameGroupMask.removeEventListener("touchEnd", _resunmeFunc, this);
+        }
+        this.pauseBtn.addEventListener('touchEnd', () => {
+            if (this.pause) {
+                _resunmeFunc();
+            } else {
+                this.pause = true;
+
+                this.gameGroupMask.visible = true;
+                egret.Tween.get(this.gameGroupMask).to({ alpha: 0 }, 0).to({ alpha: 1 }, 600);
+
+                this.gameGroupMask.addEventListener("touchEnd", _resunmeFunc, this);
+
+                this.pauseBtn.texture = RES.getRes("RESUME_BTN");
+
+                this.dispatchEvent(GameProcessEvent.newInstance('STAGE_PAUSED'));
+            }
+        }, this);
 
         // var imgLoader: egret.ImageLoader = new egret.ImageLoader();
         // imgLoader.once(egret.Event.COMPLETE, (evt: egret.Event) => {
@@ -258,11 +466,7 @@ class Main extends eui.UILayer {
         // request.addEventListener(egret.ProgressEvent.PROGRESS, (e) => {
         // }, this);
 
-
-
     }
-
-
 
     /**
      * 点击按钮

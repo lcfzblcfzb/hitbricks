@@ -22,14 +22,14 @@ abstract class RebounceObj extends egret.Sprite implements IFlexible, IConfigura
 					// console.log("stagewidth:" + this.stage.width);
 					// console.log("stageheight:" + this.stage.height);
 					// #FFD700
-					// let hitRec = new egret.Shape();
-					// hitRec.x = firstP.x;
-					// hitRec.y = firstP.y;
-					// hitRec.graphics.lineStyle(0, 0xFFD700);
-					// hitRec.graphics.beginFill(0xFFD700, 2);
-					// hitRec.graphics.drawCircle(0, 0, 2);
-					// hitRec.graphics.endFill();
-					// this.stage.addChild(hitRec);
+					let hitRec = new egret.Shape();
+					hitRec.x = firstP.x;
+					hitRec.y = firstP.y;
+					hitRec.graphics.lineStyle(0, 0xFFD700);
+					hitRec.graphics.beginFill(0xFFD700, 2);
+					hitRec.graphics.drawCircle(0, 0, 2);
+					hitRec.graphics.endFill();
+					this.stage.addChild(hitRec);
 
 
 					var label: egret.TextField = new egret.TextField();

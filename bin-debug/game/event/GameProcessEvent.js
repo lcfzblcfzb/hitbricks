@@ -17,6 +17,11 @@ var GameProcessEvent = (function (_super) {
         if (cancelable === void 0) { cancelable = false; }
         return _super.call(this, type, true, cancelable) || this;
     }
+    GameProcessEvent.newInstance = function (type, data) {
+        var event = new GameProcessEvent(type);
+        event.data = data;
+        return event;
+    };
     GameProcessEvent.GAME_START = "GAME_START";
     GameProcessEvent.STAGE_START = "STAGE_START";
     GameProcessEvent.STAGE_END = "STAGE_END";

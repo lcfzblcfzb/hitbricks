@@ -14,35 +14,30 @@ class Ball extends egret.Sprite implements IMovable, IConfigurable {
 		this.y = y;
 
 		let config = RES.getRes("myGame_json");
-
-		// this.graphics.lineStyle(0, parseInt(config.ballColor));
-		// this.graphics.beginFill(parseInt(config.ballColor), 1);
-		// this.graphics.drawCircle(0, 0, config.ballRadius);
-		// this.graphics.endFill();
 		this.backStage = GameManager.getInstance().stage;
-		this.width = config.ballRadius * 2;
-		this.height = config.ballRadius * 2;
+
+		let configWidth = config.ballRadius * 2;
+		let configHeight = config.ballRadius * 2;
+		this.width = configWidth
+		this.height = configHeight
 		this.anchorOffsetX = config.ballRadius;
 		this.anchorOffsetY = config.ballRadius;
-
-		// let img: egret.Bitmap = new egret.Bitmap();
-		// img.texture = RES.getRes("initball_png");
-		// img.width = this.width;
-		// img.height = this.height;
-		// this.addChild(img);
+		
 		const mcFactory: egret.MovieClipDataFactory = this.backStage.stage['mcFactory'];
 		var mc1: egret.MovieClip = new egret.MovieClip(mcFactory.generateMovieClipData("ball"));
 		//设置缩放
 		let scaleX = this.width / mc1.width;
-		let scaleY = this.width / mc1.height;
+		let scaleY = this.height  / mc1.height;
 		mc1.scaleX = scaleX;
 		mc1.scaleY = scaleY;
 		this.addChild(mc1);
 
-		mc1.gotoAndPlay(0,-1);
+		mc1.gotoAndPlay(0, -1);
+
 	}
 
 	update(timeStamp: number): void {
+
 		this.x += this.speedX;
 		this.y += this.speedY;
 

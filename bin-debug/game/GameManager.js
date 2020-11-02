@@ -5,6 +5,7 @@ var GameManager = (function () {
     function GameManager() {
         this.balls = [];
         this.entityMap = {};
+        this.debugLine = new egret.Shape();
     }
     GameManager.getInstance = function () {
         return GameManager.gm;
@@ -27,38 +28,43 @@ var GameManager = (function () {
     };
     //完成关卡
     GameManager.prototype.stageSuccess = function () {
+        this.finished = true;
         console.log("stage success");
-        this.stage.dispatchEvent(new GameProcessEvent("STAGE_END"));
+        this.stage.dispatchEvent(GameProcessEvent.newInstance("STAGE_END", true));
         if (StageMng.getInstance().isLastStage()) {
-            this.stage.dispatchEvent(new GameProcessEvent("GAME_END"));
+            this.stage.dispatchEvent(GameProcessEvent.newInstance("GAME_END", true));
             //游戏结束；
-        }
-        else {
-            //下一关
-            var nextStage = StageMng.getInstance().getNextStage();
-            this.initStage(nextStage);
-            PlayerMng.getInstance().chap = parseInt(nextStage.chap);
-            PlayerMng.getInstance().index = parseInt(nextStage.index);
         }
     };
     //是否关卡成功完成
     GameManager.prototype.isStageSuccess = function () {
-        if (this.entityMap[BRICK] != null) {
-            return this.entityMap[BRICK].length <= 0;
+        if (!this.finished) {
+            if (this.entityMap[BRICK] != null) {
+                return this.entityMap[BRICK].length <= 0;
+            }
+            else {
+                return true;
+            }
         }
         else {
-            return true;
+            return false;
         }
     };
     //是否关卡失败
     GameManager.prototype.isStageFail = function () {
-        return this.balls.length <= 0;
+        if (!this.finished) {
+            return this.balls.length <= 0;
+        }
+        else {
+            return false;
+        }
     };
     //关卡失败结束
     GameManager.prototype.stageFail = function () {
-        this.stage.dispatchEvent(new GameProcessEvent("STAGE_END"));
+        this.finished = true;
+        this.stage.dispatchEvent(GameProcessEvent.newInstance("STAGE_END", false));
         // gameOver
-        var event = new GameProcessEvent("GAME_END");
+        var event = GameProcessEvent.newInstance("GAME_END", false);
         this.stage.dispatchEvent(event);
     };
     /**
@@ -67,8 +73,9 @@ var GameManager = (function () {
     GameManager.prototype._resetFields = function () {
         this.balls = [];
         this.entityMap = {};
-        this.trigger = null;
+        this.touchZone = null;
         this.bat = null;
+        this.finished = false; //标记为，标记本局游戏是否完结了，完结之后不会触发其他的效果（成功、失败事件只会触发一次）
         if (this.stage != null)
             this.stage.removeChildren();
     };
@@ -106,35 +113,35 @@ var GameManager = (function () {
                     // console.log("stageheight:" + this.stage.height);
                     // console.log("prv"+configable.y );
                     // console.log("aft"+configable.y );
-                    // let hitRec = new egret.Shape();
-                    // let inflateRec = configable.getTransformedBounds(GameManager.getInstance().stage).clone();
-                    //DEBUG------
-                    // inflateRec.inflate(ball.width / 2, ball.height / 2);//计算出碰撞外壳矩形;
-                    // hitRec.x = inflateRec.x;
-                    // hitRec.y = inflateRec.y;
-                    // hitRec.graphics.lineStyle(0, 0x000080);
-                    // hitRec.graphics.beginFill(0x000080, 1);
-                    // hitRec.graphics.drawRect(0, 0, inflateRec.width, inflateRec.height);
-                    // hitRec.graphics.endFill();
-                    // this.stage.addChild(hitRec);
+                    if (true) {
+                        var hitRec = new egret.Shape();
+                        var inflateRec = configable.getTransformedBounds(GameManager.getInstance().stage).clone();
+                        //DEBUG------
+                        inflateRec.inflate(ball.width / 2, ball.height / 2); //计算出碰撞外壳矩形;
+                        hitRec.x = inflateRec.x;
+                        hitRec.y = inflateRec.y;
+                        hitRec.graphics.lineStyle(0, 0x000080);
+                        hitRec.graphics.beginFill(0x000080, 1);
+                        hitRec.graphics.drawRect(0, 0, inflateRec.width, inflateRec.height);
+                        hitRec.graphics.endFill();
+                        this.stage.addChild(hitRec);
+                    }
                     //------DEBUG
                     this.stage.addChild(configable);
                     this.addToEntityMap(configable);
                 }
             }
         }
-        this.trigger = new egret.Shape();
-        this.trigger.name = "startTrigger";
-        this.trigger.graphics.beginFill(0x00ff00, 0.2);
-        this.trigger.graphics.drawRect(0, 0, this.stage.stage.stageWidth, 100);
-        this.trigger.graphics.endFill();
-        this.trigger.x = 0;
-        this.trigger.y = this.bat.y;
-        this.trigger.height = 100;
-        this.trigger.width = this.stage.width;
-        this.trigger.touchEnabled = true;
-        this.stage.addChild(this.trigger);
-        console.log(this.trigger.getBounds().height);
+        this.touchZone = new egret.Shape();
+        this.touchZone.name = "startTrigger";
+        this.touchZone.graphics.beginFill(0x00ff00, 0);
+        this.touchZone.graphics.drawRect(0, 0, this.stage.stage.stageWidth, 2 * (this.stage.stage.stageHeight - this.bat.y));
+        this.touchZone.graphics.endFill();
+        this.touchZone.x = 0;
+        this.touchZone.y = 2 * this.bat.y - this.stage.stage.stageHeight;
+        this.touchZone.width = this.stage.width;
+        this.touchZone.touchEnabled = true;
+        this.stage.addChild(this.touchZone);
         this.deadZone = new egret.Shape();
         this.deadZone.name = "deadZone";
         this.deadZone.graphics.beginFill(0x191970, 0.2);
@@ -142,37 +149,58 @@ var GameManager = (function () {
         this.deadZone.graphics.endFill();
         this.deadZone.x = 0;
         this.deadZone.y = this.bat.y + (this.stage.height - this.bat.y) / 2;
-        this.stage.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapInitBegin, this);
+        this.stage.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onInitTouchMoveListener, this);
+        this.stage.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onInitTouchMoveListener, this);
+        this.stage.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchTapInitBegin, this);
         this.stage.dispatchEvent(new GameProcessEvent("STAGE_START"));
-        console.log("windowwidth:" + window.innerWidth);
-        console.log("windowheight:" + window.innerHeight);
-        console.log("stagestagewidth:" + this.stage.stage.stageWidth);
-        console.log("stagestageheight:" + this.stage.stage.stageHeight);
         if (true) {
             var gmBtn = new eui.Button();
             gmBtn.label = "over";
             gmBtn.addEventListener("touchEnd", function (e) {
                 _this.stageSuccess();
+                e.stopPropagation();
             }, this);
             this.stage.addChild(gmBtn);
+            this.stage.addChild(this.debugLine);
+            this.debugLine.graphics.lineStyle(0.5, 0xff3814, 0.5);
         }
     };
-    //游戏开始， 初始化速度
+    //游戏开始， 初始化速度,移除准备事件的回调，增加游戏中的事件监听
     GameManager.prototype.onTouchTapInitBegin = function (evt) {
         egret.log("on onTouchTapInitBegin begin");
+        var config = RES.getRes("myGame_json");
         for (var _i = 0, _a = this.balls; _i < _a.length; _i++) {
             var ball = _a[_i];
-            ball.speedY = -12;
-            ball.speedX = 0;
+            ball.speedY = config['ballInitSpeedY'];
+            ball.speedX = config['ballInitSpeedX'];
         }
-        this.stage.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTapInitBegin, this);
-        this.trigger.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchTapPlaying, this);
-        this.trigger.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchTapPlaying, this);
+        //移除准备事件回调
+        this.stage.removeEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onInitTouchMoveListener, this);
+        this.stage.removeEventListener(egret.TouchEvent.TOUCH_MOVE, this.onInitTouchMoveListener, this);
+        this.stage.removeEventListener(egret.TouchEvent.TOUCH_END, this.onTouchTapInitBegin, this);
+        //增加游戏中监听
+        this.touchZone.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchTapPlaying, this);
+        this.touchZone.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchTapPlaying, this);
+    };
+    //游戏开始，玩家按下手指还没抬起的事件回调
+    GameManager.prototype.onInitTouchMoveListener = function (evt) {
+        if (this.bat != null) {
+            this.bat.x = evt.stageX;
+            for (var _i = 0, _a = this.balls; _i < _a.length; _i++) {
+                var ball = _a[_i];
+                ball.x = this.bat.x;
+            }
+        }
     };
     GameManager.prototype.update = function (timeStamp) {
         for (var _i = 0, _a = this.balls; _i < _a.length; _i++) {
             var ball = _a[_i];
+            this.debugLine.graphics.moveTo(ball.x, ball.y);
             ball.update(timeStamp);
+            this.debugLine.graphics.lineTo(ball.x, ball.y);
+            var ballDebugRec = ball.getTransformedBounds(this.stage);
+            this.debugLine.graphics.drawRect(ballDebugRec.x, ballDebugRec.y, ballDebugRec.width, ballDebugRec.height);
+            this.debugLine.graphics.endFill();
             var ballRec = ball.getTransformedBounds(this.stage);
             var deadRec = this.deadZone.getTransformedBounds(this.stage);
             if (deadRec.intersects(ballRec)) {
@@ -218,13 +246,10 @@ var GameManager = (function () {
         }
         return false;
     };
+    //移动事件监听;
     GameManager.prototype.onTouchTapPlaying = function (evt) {
         if (this.bat != null) {
             this.bat.x = evt.stageX;
-            var originRec = this.bat.getTransformedBounds(GameManager.getInstance().stage);
-            var inflateRec = originRec.clone();
-            inflateRec.inflate(this.balls[0].width / 2, this.balls[0].height / 2); //计算出碰撞外壳矩形;
-            // console.log(inflateRec.left + ";" + inflateRec.right + ";" + inflateRec.top + ";" + inflateRec.bottom);
         }
     };
     GameManager.gm = new GameManager();

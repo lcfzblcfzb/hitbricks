@@ -6,7 +6,7 @@
  */
 declare interface Platform {
 
-    getUserInfo(): Promise<any>;
+    getUserInfo(x,y,w,h): Promise<any>;
 
     login(): Promise<any>
 

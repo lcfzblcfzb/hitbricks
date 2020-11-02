@@ -79,8 +79,13 @@ var Main = (function (_super) {
     function Main() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.UIlayer = _this;
+        _this.pause = false;
         return _this;
     }
+    //获取单例；
+    Main.getInstance = function () {
+        return Main.instance;
+    };
     Main.prototype.createChildren = function () {
         var _this = this;
         _super.prototype.createChildren.call(this);
@@ -93,6 +98,9 @@ var Main = (function (_super) {
         egret.lifecycle.onResume = function () {
             egret.ticker.resume();
         };
+        if (Main.instance == null) {
+            Main.instance = this;
+        }
         //inject the custom material parser
         //注入自定义的素材解析器
         var assetAdapter = new AssetAdapter();
@@ -115,23 +123,43 @@ var Main = (function (_super) {
     Main.prototype.runGame = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
-            var result, setting, init;
+            var result, loginWechatBtn, userInfo, setting, init;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.loadResource()];
                     case 1:
                         _a.sent();
-                        return [4 /*yield*/, this.createGameScene()];
-                    case 2:
-                        _a.sent();
                         return [4 /*yield*/, RES.getResAsync("description_json")];
-                    case 3:
+                    case 2:
                         result = _a.sent();
+                        this._createBG();
+                        loginWechatBtn = new eui.Label();
+                        loginWechatBtn.x = 0.5 * this.stage.stageWidth;
+                        loginWechatBtn.y = 0.2 * this.stage.stageHeight;
+                        loginWechatBtn.width = 128;
+                        loginWechatBtn.height = 128;
+                        loginWechatBtn.text = "用户授权";
+                        loginWechatBtn.verticalAlign = egret.VerticalAlign.MIDDLE;
+                        loginWechatBtn.textColor = 0x29179c;
+                        loginWechatBtn.stroke = 2;
+                        loginWechatBtn.strokeColor = 0x5748bd;
+                        loginWechatBtn.background = true;
+                        loginWechatBtn.backgroundColor = 0xafbd4a;
+                        loginWechatBtn.alpha = 0.8;
+                        this.addChild(loginWechatBtn);
                         return [4 /*yield*/, platform.login()];
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, platform.getUserInfo((loginWechatBtn.x - 64) / this.stage.stageWidth, 0.2, 128 / this.stage.stageWidth, 128 / this.stage.stageHeight)];
                     case 4:
+                        userInfo = _a.sent();
+                        console.log(userInfo);
+                        this.removeChild(loginWechatBtn);
+                        return [4 /*yield*/, this.createGameScene()];
+                    case 5:
                         _a.sent();
                         return [4 /*yield*/, RES.getResAsync("myGame_json")];
-                    case 5:
+                    case 6:
                         setting = _a.sent();
                         if (PlayerMng.getInstance().chap <= 0) {
                             //初始化为第一关；
@@ -140,33 +168,137 @@ var Main = (function (_super) {
                             PlayerMng.getInstance().index = setting.initIndex;
                         }
                         return [4 /*yield*/, StageMng.getInstance().init()];
-                    case 6:
+                    case 7:
                         init = _a.sent();
                         this.loginUI.updateStageIndex();
                         //游戏结束
-                        this.addEventListener(GameProcessEvent.GAME_END, function () {
-                            _this.loginUI.visible = true;
-                            _this.gameGroup.mask = _this.gameGroupMask;
+                        this.addEventListener(GameProcessEvent.GAME_END, function (e) {
                             PlayerMng.getInstance().chap = setting.initChap;
                             PlayerMng.getInstance().index = setting.initIndex;
                             _this.loginUI.updateStageIndex();
+                            //设置暂停按钮为不可见
+                            _this.pauseBtn.visible = false;
+                            if (e.data) {
+                                //玩家胜利 播放胜利图片
+                                var label = new egret.TextField();
+                                label.text = "YOU WIN,NOW HAPPY?";
+                                label.textColor = 0xff002f;
+                                label.size = 60;
+                                label.verticalAlign = egret.VerticalAlign.MIDDLE;
+                                label.alpha = 0;
+                                _this.addChild(label);
+                                label.height = 500;
+                                label.width = 300;
+                                label.anchorOffsetX = label.width / 2;
+                                label.anchorOffsetY = label.height / 2;
+                                label.wordWrap = true;
+                                label.multiline = true;
+                                label.type = egret.TextFieldType.INPUT;
+                                label.x = _this.stage.stageWidth / 2;
+                                label.y = _this.stage.stageHeight / 3;
+                                var tween = egret.Tween.get(label).to({ alpha: 1 }, 1000, egret.Ease.circIn).wait(700).call(function () {
+                                    //玩家失败 播放失败图片
+                                    var img = new egret.Bitmap();
+                                    img.texture = RES.getRes("SAD_SCENE");
+                                    img.anchorOffsetX = img.width / 2;
+                                    img.anchorOffsetY = img.height / 2;
+                                    img.x = _this.stage.stageWidth / 2;
+                                    img.y = _this.stage.stageHeight / 2;
+                                    img.fillMode = egret.BitmapFillMode.SCALE;
+                                    _this.addChild(img);
+                                    var listener = function (e) {
+                                        _this.removeChild(label);
+                                        _this.removeChild(img);
+                                        _this.loginUI.visible = true;
+                                        _this.gameGroupMask.visible = true;
+                                        _this.removeEventListener("touchTap", listener, _this);
+                                    };
+                                    _this.addEventListener('touchTap', listener, _this);
+                                });
+                                //游戏内容变成透明
+                                egret.Tween.get(_this.gameGroup).to({ alpha: 0 }, 1000);
+                            }
+                            else {
+                                //玩家失败 播放失败动画
+                                var label = new egret.TextField();
+                                label.text = "YOU DIE";
+                                label.textColor = 0xff002f;
+                                label.size = 60;
+                                label.verticalAlign = egret.VerticalAlign.MIDDLE;
+                                label.alpha = 0;
+                                label.anchorOffsetX = label.width / 2;
+                                label.anchorOffsetY = label.height / 2;
+                                _this.addChild(label);
+                                label.x = _this.stage.stageWidth / 2;
+                                label.y = _this.stage.stageHeight / 3;
+                                var tween = egret.Tween.get(label).to({ alpha: 1 }, 1500, egret.Ease.circIn).wait(700).call(function () {
+                                    //玩家失败 播放失败图片
+                                    var img = new egret.Bitmap();
+                                    img.texture = RES.getRes("FAIL_SCENE");
+                                    img.anchorOffsetX = img.width / 2;
+                                    img.anchorOffsetY = img.height / 2;
+                                    img.x = _this.stage.stageWidth / 2;
+                                    img.y = _this.stage.stageHeight / 2;
+                                    img.fillMode = egret.BitmapFillMode.SCALE;
+                                    _this.addChild(img);
+                                    var listener = function (e) {
+                                        //重新设置为可见
+                                        _this.removeChild(label);
+                                        _this.removeChild(img);
+                                        //显示UI 操作
+                                        _this.loginUI.visible = true;
+                                        _this.gameGroupMask.visible = true;
+                                        _this.removeEventListener("touchTap", listener, _this);
+                                    };
+                                    _this.addEventListener('touchTap', listener, _this);
+                                });
+                                egret.Tween.get(_this.gameGroup).to({ alpha: 0 }, 1000);
+                            }
+                        }, this);
+                        //游戏结束
+                        this.addEventListener(GameProcessEvent.STAGE_END, function (e) {
+                            if (e.data && !StageMng.getInstance().isLastStage()) {
+                                //暂停按钮隐藏
+                                _this.pauseBtn.visible = false;
+                                //玩家小关胜利 播放胜利图片
+                                var img = new egret.Bitmap();
+                                img.texture = RES.getRes("WIN_SCENE");
+                                img.fillMode = egret.BitmapFillMode.SCALE;
+                                img.anchorOffsetX = img.width / 2;
+                                img.anchorOffsetY = img.height / 2;
+                                img.x = _this.stage.stageWidth / 2;
+                                img.y = _this.stage.stageHeight / 2;
+                                _this.addChild(img);
+                                var listener_1 = function (e) {
+                                    _this.removeChild(img);
+                                    _this.removeEventListener("touchEnd", listener_1, _this);
+                                    //下一关
+                                    var nextStage = StageMng.getInstance().getNextStage();
+                                    GameManager.getInstance().initStage(nextStage);
+                                    PlayerMng.getInstance().chap = parseInt(nextStage.chap);
+                                    PlayerMng.getInstance().index = parseInt(nextStage.index);
+                                };
+                                _this.addEventListener('touchEnd', listener_1, _this);
+                                egret.Tween.get(_this.gameGroup).to({ alpha: 0 }, 1000);
+                            }
                         }, this);
                         //游戏开始
                         this.addEventListener(GameProcessEvent.STAGE_START, function () {
                             _this.loginUI.visible = false;
-                            _this.gameGroup.mask = null;
+                            _this.gameGroupMask.visible = false;
+                            _this.pauseBtn.visible = true;
+                            egret.Tween.get(_this.gameGroup).to({ alpha: 1 }, 1000);
                         }, this);
                         //游戏暂停
                         this.addEventListener(GameProcessEvent.STAGE_PAUSED, function () {
-                            _this.loginUI.visible = true;
-                            _this.loginUI.updateStageIndex();
-                            _this.gameGroup.mask = _this.gameGroupMask;
+                            // this.gameGroupMask.visible = true;
                         }, this);
                         //游戏暂停返回
                         this.addEventListener(GameProcessEvent.STAGE_RETURN, function () {
                             _this.loginUI.visible = false;
-                            _this.gameGroup.mask = null;
+                            _this.gameGroupMask.visible = false;
                         }, this);
+                        this.dispatchEvent(GameProcessEvent.newInstance('GAME_START'));
                         return [2 /*return*/];
                 }
             });
@@ -181,15 +313,18 @@ var Main = (function (_super) {
                         _a.trys.push([0, 4, , 5]);
                         loadingView = new LoadingUI();
                         this.stage.addChild(loadingView);
-                        // await RES.loadConfig("default.res.json", "http://139.155.27.151:8080/res/resource/").catch((err) => {
-                        // });
-                        return [4 /*yield*/, RES.loadConfig("resource/default.res.json", "resource/")];
+                        return [4 /*yield*/, RES.loadConfig("default.res.json", "https://www.lcfme.fun:8080/res/resource/").catch(function (err) {
+                                console.log("err loading res");
+                                console.log(err);
+                            })];
                     case 1:
-                        // await RES.loadConfig("default.res.json", "http://139.155.27.151:8080/res/resource/").catch((err) => {
-                        // });
                         _a.sent();
+                        // await RES.loadConfig("resource/default.res.json", "resource/");
+                        //
                         return [4 /*yield*/, RES.loadGroup("preload", 0, loadingView)];
                     case 2:
+                        // await RES.loadConfig("resource/default.res.json", "resource/");
+                        //
                         _a.sent();
                         return [4 /*yield*/, this.loadTheme()];
                     case 3:
@@ -228,9 +363,19 @@ var Main = (function (_super) {
         });
     };
     Main.prototype.update = function (timeStamp) {
-        // console.log("tick:" + timeStamp);
-        GameManager.getInstance().update(timeStamp);
+        if (!this.pause) {
+            // console.log("tick:" + timeStamp);
+            GameManager.getInstance().update(timeStamp);
+        }
         return false;
+    };
+    //创建背景图
+    Main.prototype._createBG = function () {
+        var bg = Utils.createBitmapByName("BG_COMMON");
+        bg.fillMode = egret.BitmapFillMode.SCALE;
+        this.addChild(bg);
+        bg.width = this.stage.stageWidth;
+        bg.height = this.stage.stageHeight;
     };
     /**
      * 创建场景界面
@@ -238,26 +383,61 @@ var Main = (function (_super) {
      */
     Main.prototype.createGameScene = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var bg, stageW, stageH;
+            var _this = this;
+            var stageW, stageH, shp, _resunmeFunc;
             return __generator(this, function (_a) {
-                bg = Utils.createBitmapByName("BG_COMMON");
-                bg.fillMode = egret.BitmapFillMode.SCALE;
-                this.addChild(bg);
                 stageW = this.stage.stageWidth;
                 stageH = this.stage.stageHeight;
-                bg.width = stageW;
-                bg.height = stageH;
-                this.gameGroupMask = new eui.Group();
-                this.gameGroupMask.width = this.width;
-                this.gameGroupMask.height = this.height;
-                this.gameGroupMask.touchThrough = true;
-                this.addChild(this.gameGroupMask);
                 this.gameGroup = new eui.Group();
                 this.gameGroup.width = this.width;
                 this.gameGroup.height = this.height;
                 this.addChild(this.gameGroup);
+                this.gameGroupMask = new eui.Group();
+                this.gameGroupMask.alpha = 0;
+                shp = new egret.Shape();
+                shp.width = this.stage.stageWidth;
+                shp.height = this.stage.stageHeight;
+                shp.graphics.beginFill(0xff0000, 0.2);
+                shp.graphics.drawRect(0, 0, this.stage.stageWidth, this.stage.stageHeight);
+                shp.graphics.endFill();
+                this.gameGroupMask.touchChildren = false;
+                this.gameGroupMask.touchThrough = false;
+                this.gameGroupMask.addChild(shp);
+                this.addChild(this.gameGroupMask);
                 this.loginUI = new LoginUI();
                 this.addChild(this.loginUI);
+                //暂停按钮
+                this.pauseBtn = new egret.Bitmap();
+                this.pauseBtn.visible = false;
+                this.pauseBtn.texture = RES.getRes("PAUSE_BTN");
+                this.pauseBtn.width = 32;
+                this.pauseBtn.height = 32;
+                this.addChild(this.pauseBtn);
+                this.pauseBtn.x = stageW - this.pauseBtn.width - 5;
+                this.pauseBtn.y = 5;
+                this.pauseBtn.touchEnabled = true;
+                _resunmeFunc = function () {
+                    egret.Tween.get(_this.gameGroupMask).to({ alpha: 0 }, 600).call(function () {
+                        _this.gameGroupMask.visible = false;
+                        _this.pause = false;
+                    });
+                    _this.pauseBtn.texture = RES.getRes("PAUSE_BTN");
+                    if (_this.gameGroupMask.hasEventListener("touchEnd"))
+                        _this.gameGroupMask.removeEventListener("touchEnd", _resunmeFunc, _this);
+                };
+                this.pauseBtn.addEventListener('touchEnd', function () {
+                    if (_this.pause) {
+                        _resunmeFunc();
+                    }
+                    else {
+                        _this.pause = true;
+                        _this.gameGroupMask.visible = true;
+                        egret.Tween.get(_this.gameGroupMask).to({ alpha: 0 }, 0).to({ alpha: 1 }, 600);
+                        _this.gameGroupMask.addEventListener("touchEnd", _resunmeFunc, _this);
+                        _this.pauseBtn.texture = RES.getRes("RESUME_BTN");
+                        _this.dispatchEvent(GameProcessEvent.newInstance('STAGE_PAUSED'));
+                    }
+                }, this);
                 return [2 /*return*/];
             });
         });
