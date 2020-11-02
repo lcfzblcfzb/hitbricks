@@ -12,10 +12,7 @@ export class WxgamePlugin implements plugins.Command {
         return md5.update(content).digest('hex');
     }
     async onFile(file: plugins.File) {
-<<<<<<< HEAD
         
-=======
->>>>>>> temp
         if (file.extname == '.js') {
             const filename = file.origin;
             if (filename == "libs/modules/promise/promise.js" || filename == 'libs/modules/promise/promise.min.js') {
@@ -118,13 +115,9 @@ export class WxgamePlugin implements plugins.Command {
         }
         
         let libDir = path.join(outputDir, "egret-library")
-<<<<<<< HEAD
         try{
             fs.mkdirSync(libDir)
         }catch(e){}
-=======
-        fs.mkdirSync(libDir)
->>>>>>> temp
         let pluginData = { "main": "index.js" }
         this.writeData(pluginData, path.join(libDir, "plugin.json"))
         let engineJS = ['assetsmanager', 'dragonBones', 'egret', 'game', 'eui', 'socket', 'tween']

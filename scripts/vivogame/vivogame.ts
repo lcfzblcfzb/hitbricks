@@ -7,11 +7,6 @@ export class VivogamePlugin implements plugins.Command {
     async onFile(file: plugins.File) {
         if (file.extname == '.js') {
             const filename = file.origin;
-<<<<<<< HEAD
-
-=======
-            
->>>>>>> temp
             if (filename == "libs/modules/promise/promise.js" || filename == 'libs/modules/promise/promise.min.js') {
                 return null;
             }
@@ -92,15 +87,9 @@ export class VivogamePlugin implements plugins.Command {
         let gameJSONContent = JSON.parse(fs.readFileSync(gameJSONPath, { encoding: "utf8" }));
         gameJSONContent.deviceOrientation = orientation;
         let engineVersion = this.readData(path.join(pluginContext.projectRoot, "egretProperties.json")).engineVersion
-<<<<<<< HEAD
         if (!gameJSONContent.thirdEngine) gameJSONContent.thirdEngine = {}
         gameJSONContent.thirdEngine.egret = engineVersion
 
-=======
-        if(!gameJSONContent.thirdEngine)gameJSONContent.thirdEngine={}
-        gameJSONContent.thirdEngine.egret = engineVersion
-        
->>>>>>> temp
         fs.writeFileSync(gameJSONPath, JSON.stringify(gameJSONContent, null, "\t"));
         let isPublish = pluginContext.buildConfig.command == "publish" ? true : false;
         let configArr: any[] = []
@@ -109,11 +98,6 @@ export class VivogamePlugin implements plugins.Command {
             if (isPublish) {
                 if (jsFile == "main.js") {
                     jsFile = 'main.min.js'
-<<<<<<< HEAD
-=======
-                } else if (jsFile == "default.thm.js") {
-                    jsFile = "default.thm.min.js"
->>>>>>> temp
                 }
             }
             configArr.push(JSON.stringify({
@@ -122,21 +106,12 @@ export class VivogamePlugin implements plugins.Command {
                 module_from: `engine/js/${jsFile}`,
             }, null, "\t"))
         }
-<<<<<<< HEAD
         const replaceConfigStr = '\/\/----auto option start----\n\t\t' + configArr.toString() + '\n\t\t\/\/----auto option end----';
         const minigameConfigPath = path.join(pluginContext.outputDir, "../", "minigame.config.js");
         if (!fs.existsSync(minigameConfigPath)) {
             //5.2.28版本，vivo更新了项目结构，老项目需要升级
             fs.writeFileSync(path.join(pluginContext.outputDir, "../", "vivo更新了项目结构，请重新创建vivo小游戏项目.js"), "vivo更新了项目结构，请重新创建vivo小游戏项目");
         } else {
-=======
-        const replaceConfigStr = '\/\/----auto option start----\n\t\t' + configArr.toString()  + '\n\t\t\/\/----auto option end----';
-        const minigameConfigPath = path.join(pluginContext.outputDir,"../",  "minigame.config.js");
-        if(!fs.existsSync(minigameConfigPath)){
-            //5.2.28版本，vivo更新了项目结构，老项目需要升级
-            fs.writeFileSync(path.join(pluginContext.outputDir,"../","vivo更新了项目结构，请重新创建vivo小游戏项目.js"), "vivo更新了项目结构，请重新创建vivo小游戏项目");
-        }else{
->>>>>>> temp
             let configJSContent = fs.readFileSync(minigameConfigPath, { encoding: "utf8" });
             configJSContent = configJSContent.replace(reg, replaceConfigStr);
             fs.writeFileSync(minigameConfigPath, configJSContent);

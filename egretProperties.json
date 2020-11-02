@@ -1,17 +1,9 @@
 {
-<<<<<<< HEAD
   "engineVersion": "5.3.10",
   "compilerVersion": "5.3.10",
   "template": {},
   "target": {
     "current": "web"
-=======
-  "engineVersion": "5.2.33",
-  "compilerVersion": "5.2.33",
-  "template": {},
-  "target": {
-    "current": "wxgame"
->>>>>>> temp
   },
   "modules": [
     {
@@ -24,12 +16,9 @@
       "name": "assetsmanager"
     },
     {
-<<<<<<< HEAD
       "name": "dragonBones"
     },
     {
-=======
->>>>>>> temp
       "name": "game"
     },
     {
@@ -46,15 +35,5 @@
       "name": "egretmgobe",
       "path": "./libs/egretmgobe"
     }
-<<<<<<< HEAD
   ]
-=======
-  ],
-  "eui": {
-    "exmlRoot": [
-      "resource/eui_skins",
-      "resource/main"
-    ]
-  }
->>>>>>> temp
 }
