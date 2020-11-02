@@ -281,7 +281,7 @@ class Main extends eui.UILayer {
             const loadingView = new LoadingUI();
             this.stage.addChild(loadingView);
             egret.ImageLoader.crossOrigin = "anonymous";
-            
+
             await RES.loadConfig("default.res.json", "https://www.lcfme.fun:8080/res/resource/").catch((err) => {
                 console.log("err loading res");
                 console.log(err);
