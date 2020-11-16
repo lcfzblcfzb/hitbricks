@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<e:Skin class="SpellBtnSkin"
+	states="up,down,disabled" width="64"
+	height="64" xmlns:e="http://ns.egret.com/eui">
+	<e:Image left="0" right="0" top="0" bottom="0"/>
+	<e:Label id="spellLabel" left="0" right="0" top="0" bottom="0" sortableChildren="false" textAlign="center" multiline="false" wordWrap="false" text="Tmp"/>
+	<e:Label text="Label" left="0" right="0" anchorOffsetX="0" anchorOffsetY="0" top="0" bottom="0" width="64" height="64" alpha="1" background="true"/>
+</e:Skin>

@@ -35,7 +35,8 @@ const config: ResourceManagerConfig = {
                         html:{
                             templateFilePath:"template/web/index.html"
                         },
-                        open: true
+                        open: false,
+                        port: 3000
                     }),
                     // new WebpackDevServerPlugin({ //新的 Webpack 编译器
                     //     libraryType: "debug",

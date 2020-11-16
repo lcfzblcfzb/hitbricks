@@ -52,6 +52,8 @@ abstract class RebounceObj extends egret.Sprite implements IFlexible, IConfigura
 					target.resetYSpeed(firstP.y == inflateRec.bottom);
 				}
 
+
+				this.onHitted();
 				if (this.deleteOnHit) {
 
 					this.onDelete();
@@ -69,6 +71,7 @@ abstract class RebounceObj extends egret.Sprite implements IFlexible, IConfigura
 			console.log("onHit Cost:" + (new Date().getTime() - startTime) + "ms");
 	}
 
+	abstract onHitted():void;//触发完事件后的调用,发生的瞬间
 	abstract getName(): string;
 	onDelete(): void { };
 

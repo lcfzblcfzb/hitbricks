@@ -113,11 +113,12 @@ class Main extends eui.UILayer {
         const setting = await RES.getResAsync("myGame_json");
         if (PlayerMng.getInstance().chap <= 0) {
             //初始化为第一关；
-
             GameManager.getInstance().init(this.gameGroup, setting);
-            PlayerMng.getInstance().chap = setting.initChap;
-            PlayerMng.getInstance().index = setting.initIndex;
+            PlayerMng.getInstance().resetProperty();
         }
+        //TODO 暂时放在这里：初始化技能
+        PlayerMng.getInstance().setUpForStage(SpellEnum.MoreBall, SpellEnum.MultiBat);
+
         const init = await StageMng.getInstance().init();
         this.loginUI.updateStageIndex();
 
@@ -246,16 +247,21 @@ class Main extends eui.UILayer {
                     PlayerMng.getInstance().chap = parseInt(nextStage.chap);
                     PlayerMng.getInstance().index = parseInt(nextStage.index);
                 };
-                this.addEventListener('touchEnd', listener, this);
 
-                egret.Tween.get(this.gameGroup).to({ alpha: 0 }, 1000);
+                egret.Tween.get(this.gameGroup).to({ alpha: 0 }, 1000).call(() => {
+                    this.addEventListener('touchEnd', listener, this);
+                });
             }
 
         }, this);
 
         //游戏开始
-        this.addEventListener(GameProcessEvent.STAGE_START, () => {
+        this.addEventListener(GameProcessEvent.GAME_START, () => {
             this.loginUI.visible = false;
+        }, this);
+
+        //游戏开始
+        this.addEventListener(GameProcessEvent.STAGE_START, () => {
             this.gameGroupMask.visible = false;
             this.pauseBtn.visible = true;
 
@@ -273,7 +279,6 @@ class Main extends eui.UILayer {
             this.gameGroupMask.visible = false;
         }, this);
 
-        this.dispatchEvent(GameProcessEvent.newInstance('GAME_START'));
     }
 
     private async loadResource() {
@@ -282,12 +287,17 @@ class Main extends eui.UILayer {
             this.stage.addChild(loadingView);
             egret.ImageLoader.crossOrigin = "anonymous";
 
-            await RES.loadConfig("default.res.json", "https://www.lcfme.fun:8080/res/resource/").catch((err) => {
-                console.log("err loading res");
-                console.log(err);
+            if (RELEASE) {
+                await RES.loadConfig("default.res.json", "https://www.lcfme.fun:8080/res/resource/").catch((err) => {
+                    console.log("err loading res");
+                    console.log(err);
 
-            });
-            // await RES.loadConfig("resource/default.res.json", "resource/");
+                });
+            }
+            if(DEBUG){
+                await RES.loadConfig("resource/default.res.json", "resource/");
+            }
+            // 
             //
             await RES.loadGroup("preload", 0, loadingView);
             await this.loadTheme();
@@ -302,7 +312,7 @@ class Main extends eui.UILayer {
         catch (e) {
             console.error(e);
         }
-    }d
+    } d
     private loadTheme() {
         return new Promise((resolve, reject) => {
             // load skin theme configuration file, you can manually modify the file. And replace the default skin.
@@ -334,10 +344,11 @@ class Main extends eui.UILayer {
     }
 
     UIlayer = this;
-    //遮罩对象
-    gameGroupMask: eui.Group;
     //游戏group,每一局都会重置;
     gameGroup: eui.Group;
+
+    //遮罩对象
+    gameGroupMask: eui.Group;
     //关卡选择UI;
     loginUI: LoginUI;
     //UI 布局group；

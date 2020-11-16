@@ -1,20 +1,19 @@
 class Bat extends RebounceObj implements IConfigurable {
 
-	public constructor(stage: egret.DisplayObjectContainer) {
-		super();
-		let stageW = stage.stage.stageWidth;
-		let stageH = stage.stage.stageHeight;
-		this.name = "bat";
+	onHitted(): void {
+		throw new Error("Method not implemented.");
+	}
 
-		let config =RES.getRes("myGame_json");
+	public constructor() {
+		super();
+
+		let config = RES.getRes("myGame_json");
 
 		this.graphics.beginFill(parseInt(config.batColor), 1);
 		this.graphics.drawRect(0, 0, config.batWidth, config.batHeight);
 		this.width = config.batWidth;
 		this.height = config.batHeight;
-		this.x = stageW / 2;
-		this.y = stageH * 0.8;
-		this.anchorOffsetX = this.width/2;
+		this.anchorOffsetX = this.width / 2;
 		this.graphics.endFill();
 	}
 	//overide
@@ -22,9 +21,26 @@ class Bat extends RebounceObj implements IConfigurable {
 		return BAT;
 	}
 
+	/**
+	 * 取得用具计算碰撞的矩形;
+	 * @param rec 可选；如果传入则使用此参数返回
+	 */
+	getHitBox(rec?: egret.Rectangle): egret.Rectangle {
+		if (!rec)
+			rec = new egret.Rectangle();
+		
+		let point = GameManager.getInstance().batHolder.localToGlobal(this.x, this.y, egret.Point.create(0, 0));
+		//需要设置偏移  否则球撞击判断位置不对；
+		rec.setTo(point.x-this.anchorOffsetX, point.y-this.anchorOffsetY, this.width, this.height);
+
+		egret.Point.release(point);
+		return rec;
+	}
+
+
 	onHit(target: IMovable) {
 		//需要传入全局对象得到相对全局坐标的矩形；
-		let originRec = this.getTransformedBounds(GameManager.getInstance().stage);
+		let originRec = this.getHitBox();
 		let inflateRec = originRec.clone();
 
 		inflateRec.inflate(target.width / 2, target.height / 2);//计算出碰撞外壳矩形;
@@ -34,9 +50,9 @@ class Bat extends RebounceObj implements IConfigurable {
 		if (intersectPoints.length > 0) {
 			let firstP = this.calcFirstIntersecPoint(intersectPoints, target);
 
- 			if (firstP != null) {
+			if (firstP != null) {
 				if (firstP.x == inflateRec.left || firstP.x == inflateRec.right) {
-					
+
 					target.resetXSpeed(firstP.x == inflateRec.right);
 				} else if (firstP.y == inflateRec.top || firstP.y == inflateRec.bottom) {
 					//当碰撞发生在板子上，根据碰撞点，对x 方向速度做不同比例的变化,距离中心越远，变化率越大
@@ -62,7 +78,7 @@ class Bat extends RebounceObj implements IConfigurable {
 						if (target.speedY > 0) {
 							debugger
 						}
-					}else{
+					} else {
 						//如果刚好是中心点
 						target.resetYSpeed(false);
 					}

@@ -7,5 +7,6 @@
     "ballInitSpeedX":1,
     "batWidth":100,
     "batHeight":10,
-    "batColor":"0x000079"
+    "batColor":"0x000079",
+    "batSpeed":10
 }
